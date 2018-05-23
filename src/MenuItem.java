@@ -1,29 +1,45 @@
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.text.FontWeight;
 
-public class MenuItem extends UIItem {
+public class MenuItem extends UIText
+{
+	private boolean selected;
 	
-	private Color color;
-	private Font font;
-	private String text;
-	
-	public MenuItem(String text, int x, int y, Font font) {
-		this.text = text;
+	public MenuItem(String text, int x, int y, int size) 
+	{
+		super(text, x, y, size, FontWeight.NORMAL, Color.WHITE);
 		super.x = x;
 		super.y = y;
-		this.font = font;
+		selected = false;
 	}
 	
-	@Override
-	public void draw(GraphicsContext gc) {
-		gc.setFill(color);
-		gc.setStroke(Color.BLACK);
-		gc.setLineWidth(1);
-		gc.setFont(font);
-		gc.fillText(text, x, y);
-		gc.fillText(text, x, y);
+	public void setSelected(boolean s)
+	{
+		selected = s;
+		super.color = selected? Color.ORANGE:Color.WHITE;
+	}
+	
+	public static void select(UIItem u)
+	{
+		if(u instanceof MenuItem)
+		{
+			MenuItem m = (MenuItem)u;
+			m.setSelected(true);
+		}
+	}
+	
+	public static void deselect(UIItem u)
+	{
+		if(u instanceof MenuItem)
+		{
+			MenuItem m = (MenuItem)u;
+			m.setSelected(false);
+		}
+	}
+	
+	public static MenuItem centerMenuItem(String text, int y, int size, int width)
+	{
+		return new MenuItem(text, UIText.centerText(text, y, size, width, FontWeight.NORMAL, Color.WHITE).getX(), y, size);
 	}
 
 }

@@ -1,5 +1,6 @@
 import javafx.scene.canvas.GraphicsContext;
-public abstract class UIItem {
+public abstract class UIItem 
+{
 	
 	protected int x;
 	protected int y;
