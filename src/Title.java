@@ -4,7 +4,7 @@ import javafx.scene.text.FontWeight;
 public class Title extends UIText {
 
 	public Title(String text, int x, int y, int size) {
-		super(text, x, y, size, FontWeight.BOLD, Color.WHITE);
+		super(text, x, y, size, FontWeight.BOLD, Color.BLUE);
 		
 	}
 

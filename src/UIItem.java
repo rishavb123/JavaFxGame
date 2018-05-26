@@ -7,6 +7,11 @@ public abstract class UIItem
 	
 	public abstract void draw(GraphicsContext gc);
 	
+	public void act(GraphicsContext gc)
+	{
+		draw(gc);
+	}
+	
 	public int getX() {return x;}
 	public int getY() {return y;}
 	
