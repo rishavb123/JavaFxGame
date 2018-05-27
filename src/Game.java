@@ -174,7 +174,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 			gc.drawImage(background, width/6, 0, 2*width/3, height);
 			
 			for(UIItem item: items)
-				item.act(gc);
+				item.update(gc);
 			
 		}
 	}

@@ -7,7 +7,7 @@ public abstract class UIItem
 	
 	public abstract void draw(GraphicsContext gc);
 	
-	public void act(GraphicsContext gc)
+	public void update(GraphicsContext gc)
 	{
 		draw(gc);
 	}

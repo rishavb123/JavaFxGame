@@ -8,6 +8,7 @@ public class Entity extends UIItem {
 	protected int dx;
 	protected int width;
 	protected int height;
+	protected int health;
 	protected Image image;
 	
 	public Entity(int x, int y) 
@@ -19,6 +20,7 @@ public class Entity extends UIItem {
 		this.width = Game.dim/10;
 		this.height = Game.dim/10;
 		image = new Image("res/imgs/Entity.png");
+		health = 100;
 	}
 	
 	public Entity(int x, int y, int dy, int dx) 
@@ -39,7 +41,7 @@ public class Entity extends UIItem {
 	}
 	
 	@Override
-	public void act(GraphicsContext gc)
+	public void update(GraphicsContext gc)
 	{
 		actions();
 		move();
@@ -56,7 +58,6 @@ public class Entity extends UIItem {
 	@Override
 	public void draw(GraphicsContext gc) {
 		gc.setFill(Color.WHITE);
-		gc.fillRect(x, y, width, height);
 		gc.drawImage(image, x, y, width, height);
 	}
 
