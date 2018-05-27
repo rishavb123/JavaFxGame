@@ -19,6 +19,7 @@ public class Player extends Entity {
 	{
 		super(x, y, dx, dy);
 		this.name = name;
+		spriteSheet = new SpriteSheet("res/imgs/Player.png");
 	}
 	
 	public String getName()
