@@ -1,6 +1,3 @@
-
-
-
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -16,6 +13,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.event.EventHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 import uiitems.*;
@@ -23,6 +21,8 @@ import uiitems.entities.*;
 import uiitems.menu.*;
 
 import constants.Constants;
+
+import input.Key;
 
 
 public class Game extends Application implements EventHandler<InputEvent>
@@ -38,6 +38,11 @@ public class Game extends Application implements EventHandler<InputEvent>
 	private String part;
 	private Stage stage;
 	
+	private HashMap<KeyCode, Key> keys;
+	private static final KeyCode[] keyCodes = {
+			KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.SPACE, KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.SHIFT, KeyCode.CONTROL, KeyCode.ENTER
+	};
+	
 	private Image background;
 	private ArrayList<UIItem> items;
 	
@@ -45,6 +50,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 	private int selectedIndex;
 	
 	private ArrayList<UIItem> gameObjects;
+	
 	private Player player;
 	String name;
 
@@ -75,6 +81,12 @@ public class Game extends Application implements EventHandler<InputEvent>
 		
 		setMenu();
 		setGame();
+		
+		keys = new HashMap<>();
+		
+		for(KeyCode k: keyCodes)
+			keys.put(k, new Key());
+		
 		items = menuItems;
 	}
 	
@@ -151,23 +163,15 @@ public class Game extends Application implements EventHandler<InputEvent>
 	
 	public void keyReleased(final KeyEvent event)
 	{
-		switch(part)
-		{
-			case "Play":
-				switch((event).getCode())
-				{
-					case SPACE:
-						player.stopFly();
-						break;
-					default:
-						break;
-				}
-				break;
-		}
+		if(keys.containsKey(event.getCode()))
+			keys.get(event.getCode()).release();
 	}
 	
 	public void keyPressed(final KeyEvent event)
 	{
+		if(keys.containsKey(event.getCode()))
+			keys.get(event.getCode()).press();
+		
 		switch(part)
 		{
 			case "Game Menu":
@@ -193,23 +197,31 @@ public class Game extends Application implements EventHandler<InputEvent>
 			case "Play":
 				switch(event.getCode())
 				{
+					case C:
+//						player.attack();
+						break;
 					case UP:
 						player.jump();
-						break;
-					case RIGHT:
-						player.move(true);
-						break;
-					case LEFT:
-						player.move(false);
-						break;
-					case SPACE:
-						player.fly();
 						break;
 					default:
 						break;
 				}
-				break;
 		}
+	}
+	
+	public void playerControl()
+	{
+		if(keys.get(KeyCode.RIGHT).isPressed())
+			player.move(true);
+		else if(keys.get(KeyCode.LEFT).isPressed())
+			player.move(false);
+		else
+			player.stop();
+		
+		if(keys.get(KeyCode.SPACE).isPressed())
+			player.fly();
+		else
+			player.stopFly();
 	}
 	
 	public static void main(String[] args)
@@ -226,6 +238,8 @@ public class Game extends Application implements EventHandler<InputEvent>
 			if(background != null)
 			gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 			gc.drawImage(background, width/6, 0, 2*width/3, height);
+			
+			playerControl();
 			
 			for(UIItem item: items)
 				item.update(gc);

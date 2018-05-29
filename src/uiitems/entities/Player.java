@@ -28,8 +28,6 @@ public class Player extends Entity {
 	{
 		actions();
 		
-		if(flying)
-			fly();
 		currentAction.getSprite().update();
 		if(currentAction.isPlayOnce() && currentAction.getSprite().hasPlayedOnce())
 		{
@@ -44,6 +42,8 @@ public class Player extends Entity {
 		
 		if(dx != 0 && bottomTouch)
 			currentAction = PlayerAction.WALK;
+		if(flying)
+			fly();
 		move();
 		draw(gc);
 	}
@@ -54,6 +54,11 @@ public class Player extends Entity {
 			dx = 20;
 		else
 			dx = -20;
+	}
+	
+	public void stop()
+	{
+		dx = 0;
 	}
 	
 	public void jump() 
@@ -74,6 +79,8 @@ public class Player extends Entity {
 
 	public void fly() 
 	{
+		if(dy>0)
+			dy-=2;
 		dy-=2;
 		currentAction = PlayerAction.FLY;
 		flying = true;

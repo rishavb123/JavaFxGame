@@ -55,6 +55,7 @@ public class Entity extends UIItem {
 		gravity();
 		if(this.y+this.height>=Constants.height && dy>0)
 		{
+			this.y = Constants.height - this.height;
 			dy=0;
 			bottomTouch = true;
 		}
