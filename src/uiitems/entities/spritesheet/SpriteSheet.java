@@ -11,7 +11,7 @@ import javafx.scene.image.Image;
 public class SpriteSheet 
 {
 
-	private static final long delay = 100;
+	private static final long delay = 50;
 	private static final int spriteWidth = 120;
 	private static final int spriteHeight = 120;
 	
@@ -21,16 +21,21 @@ public class SpriteSheet
 	private int start;
 	private BufferedImage spritesheet;
 	private boolean playedOnce;
+	private boolean hold;
+	private boolean holding;
 		
-	public SpriteSheet(String path, int start, int stop)
+	public SpriteSheet(String path, int start, int stop, boolean hold)
 	{
-		this.start = start;
 		
 		try {
 			spritesheet = ImageIO.read(getClass().getResourceAsStream(path));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		this.start = start;
+		this.hold = hold;
+		
 		time = System.nanoTime();
 		frames = new BufferedImage[stop-start];
 		currentFrame = 0;
@@ -50,6 +55,11 @@ public class SpriteSheet
 		return SwingFXUtils.toFXImage(frames[currentFrame], null);
 	}
 	
+	public boolean isHolding()
+	{
+		return this.holding;
+	}
+	
 	public void update()
 	{
 		if((System.nanoTime() - time) / 1000000 > delay)
@@ -60,15 +70,22 @@ public class SpriteSheet
 		
 		if(currentFrame == frames.length)
 		{
-			currentFrame = 0;
-			playedOnce = true;
+			if(hold) {
+				currentFrame--;
+				holding = true;
+			}
+			else {
+				currentFrame = 0;
+				playedOnce = true;
+			}
 		}
 		
 	}
 	
-	public boolean reset()
+	public void reset()
 	{
-		return true;
+		playedOnce = false;
+		currentFrame = 0;
 	}
 	
 	public boolean hasPlayedOnce()

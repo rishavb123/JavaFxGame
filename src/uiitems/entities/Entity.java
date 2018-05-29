@@ -13,6 +13,7 @@ public class Entity extends UIItem {
 	protected int width;
 	protected int height;
 	protected int health;
+	protected boolean bottomTouch;
 	
 	public Entity(int x, int y) 
 	{
@@ -20,8 +21,8 @@ public class Entity extends UIItem {
 		super.y = y;
 		dy = 0;
 		dx = 0;
-		this.width = Constants.dim/10;
-		this.height = Constants.dim/10;
+		this.width = Constants.dim/5;
+		this.height = Constants.dim/5;
 		health = 100;
 	}
 	
@@ -51,11 +52,19 @@ public class Entity extends UIItem {
 	
 	public void actions() 
 	{
-		dy+=Constants.g;
-		if(this.y+this.height>=Constants.height)
-			dy*=-1;
+		gravity();
+		if(this.y+this.height>=Constants.height && dy>0)
+		{
+			dy=0;
+			bottomTouch = true;
+		}
 	}
 
+	public void gravity()
+	{
+		dy+=Constants.g;
+	}
+	
 	@Override
 	public void draw(GraphicsContext gc) {
 		gc.setFill(Color.WHITE);

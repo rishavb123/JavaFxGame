@@ -1,4 +1,5 @@
-package game;
+
+
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -62,6 +63,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
 		scene.addEventHandler(KeyEvent.KEY_PRESSED,this);
+		scene.addEventHandler(KeyEvent.KEY_RELEASED,this);
 		
 		animate = new AnimateObjects();
 		animate.start();
@@ -69,7 +71,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 		stage.show();
 		
 		
-		background = new Image("MenuBackground.png");
+		background = new Image("res/imgs/MenuBackground.png");
 		
 		setMenu();
 		setGame();
@@ -124,7 +126,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 	{
 		setPart("Play");
 		items = gameObjects;
-//		background = new Image();
+		background = null;
 	}
 	
 	public void click()
@@ -140,31 +142,73 @@ public class Game extends Application implements EventHandler<InputEvent>
 	{
 		if(event instanceof KeyEvent)
 		{
-			switch(part)
-			{
-				case "Game Menu":
-					if(((KeyEvent)event).getCode() == KeyCode.DOWN)
-					{
-						MenuItem.deselect(menuItems.get(selectedIndex));
-						if(selectedIndex+1<menuItems.size())
-							selectedIndex++;
-						MenuItem.select(menuItems.get(selectedIndex));
-					}
-					else if(((KeyEvent)event).getCode() == KeyCode.UP)
-					{
-						MenuItem.deselect(menuItems.get(selectedIndex));
-						if(selectedIndex-1>0)
-							selectedIndex--;
-						MenuItem.select(menuItems.get(selectedIndex));
-					}
-					else if(((KeyEvent)event).getCode() == KeyCode.ENTER)
-					{
-						click();
-					}
-					break;
-				case "Play":
-					break;
-			}
+			if(event.getEventType().toString().equals("KEY_PRESSED"))
+				keyPressed((KeyEvent)event);
+			else
+				keyReleased((KeyEvent)event);
+		}
+	}
+	
+	public void keyReleased(final KeyEvent event)
+	{
+		switch(part)
+		{
+			case "Play":
+				switch((event).getCode())
+				{
+					case SPACE:
+						player.stopFly();
+						break;
+					default:
+						break;
+				}
+				break;
+		}
+	}
+	
+	public void keyPressed(final KeyEvent event)
+	{
+		switch(part)
+		{
+			case "Game Menu":
+				if(event.getCode() == KeyCode.DOWN)
+				{
+					MenuItem.deselect(menuItems.get(selectedIndex));
+					if(selectedIndex+1<menuItems.size())
+						selectedIndex++;
+					MenuItem.select(menuItems.get(selectedIndex));
+				}
+				else if(event.getCode() == KeyCode.UP)
+				{
+					MenuItem.deselect(menuItems.get(selectedIndex));
+					if(selectedIndex-1>0)
+						selectedIndex--;
+					MenuItem.select(menuItems.get(selectedIndex));
+				}
+				else if(event.getCode() == KeyCode.ENTER)
+				{
+					click();
+				}
+				break;
+			case "Play":
+				switch(event.getCode())
+				{
+					case UP:
+						player.jump();
+						break;
+					case RIGHT:
+						player.move(true);
+						break;
+					case LEFT:
+						player.move(false);
+						break;
+					case SPACE:
+						player.fly();
+						break;
+					default:
+						break;
+				}
+				break;
 		}
 	}
 	
@@ -179,6 +223,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 		{
 			gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 			gc.setFill(Color.BLACK);
+			if(background != null)
 			gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 			gc.drawImage(background, width/6, 0, 2*width/3, height);
 			
