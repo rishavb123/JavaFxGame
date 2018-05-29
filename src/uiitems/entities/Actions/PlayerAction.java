@@ -1,4 +1,4 @@
-package uiitems.entities.Actions;
+package uiitems.entities.actions;
 
 import uiitems.entities.spritesheet.SpriteSheet;
 

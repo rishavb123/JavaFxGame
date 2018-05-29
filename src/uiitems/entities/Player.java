@@ -1,8 +1,7 @@
 package uiitems.entities;
 
 import javafx.scene.canvas.GraphicsContext;
-
-import uiitems.entities.Actions.PlayerAction;
+import uiitems.entities.actions.PlayerAction;
 
 public class Player extends Entity {
 	
