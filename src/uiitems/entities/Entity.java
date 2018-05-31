@@ -36,18 +36,20 @@ public class Entity extends UIItem {
 		this.height = Constants.dim/10;
 	}
 	
+	public int getHealth()
+	{
+		return health;
+	}
+	
+	public boolean isBottomTouch()
+	{
+		return bottomTouch;
+	}
+	
 	public void move()
 	{
 		x+=dx;
 		y+=dy;
-	}
-	
-	@Override
-	public void update(GraphicsContext gc)
-	{
-		actions();
-		move();
-		draw(gc);
 	}
 	
 	public void actions() 
@@ -62,7 +64,7 @@ public class Entity extends UIItem {
 		
 		if(this.y<=0) {
 			dy = Constants.g*10;
-			health-=Constants.healthLoss;
+			health-=2*Constants.healthLoss;
 			y = 0;
 		}
 	}
@@ -70,6 +72,14 @@ public class Entity extends UIItem {
 	public void gravity()
 	{
 		dy+=Constants.g;
+	}
+	
+	@Override
+	public void update(GraphicsContext gc)
+	{
+		actions();
+		move();
+		draw(gc);
 	}
 	
 	@Override

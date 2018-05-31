@@ -12,7 +12,7 @@ public class SpriteSheet
 {
 
 	private static final long delay = 50;
-	private static final long longDelay = 200;
+	private static final long longDelay = 700;
 	private static final int spriteWidth = 120;
 	private static final int spriteHeight = 120;
 	

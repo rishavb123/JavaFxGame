@@ -9,7 +9,7 @@ public enum PlayerAction {
 	JUMP("JUMP", 3, 12, 1, true, true, false),
 	FLY("FLY", 4, 11, 3, true, true, false),
 	SHEILD("SHEILD", 5, 15, 4, true, true, false),
-	SHORTATTACK("SHORTATTACK", 6, 19, 3, true, false, true);
+	SHORTATTACK("SHORTATTACK", 6, 20, 1, true, true, true);
 		
 	private String action;
 	private int index;

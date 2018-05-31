@@ -5,7 +5,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.Group;
-import javafx.scene.image.Image;
 import javafx.animation.AnimationTimer;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
@@ -16,10 +15,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
-import uiitems.*;
-import uiitems.entities.*;
+import uiitems.Background;
+import uiitems.UIItem;
+import uiitems.entities.Player;
 import uiitems.entities.actions.PlayerAction;
-import uiitems.menu.*;
+import uiitems.menu.MenuItem;
+import uiitems.menu.Title;
 
 import constants.Constants;
 
@@ -41,10 +42,12 @@ public class Game extends Application implements EventHandler<InputEvent>
 	
 	private HashMap<KeyCode, Key> keys;
 	private static final KeyCode[] keyCodes = {
-			KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.SPACE, KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.SHIFT, KeyCode.CONTROL, KeyCode.ENTER
+		KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.SPACE, KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.SHIFT, KeyCode.CONTROL, KeyCode.ENTER
 	};
 	
-	private Image background;
+	private Background background;
+	private Background menuBackground;
+	private Background gameBackground;
 	private ArrayList<UIItem> items;
 	
 	private ArrayList<UIItem> menuItems;
@@ -77,11 +80,10 @@ public class Game extends Application implements EventHandler<InputEvent>
 		
 		stage.show();
 		
-		
-		background = new Image("res/imgs/MenuBackground.png");
-		
 		setMenu();
 		setGame();
+		
+		background = menuBackground;
 		
 		keys = new HashMap<>();
 		
@@ -99,6 +101,8 @@ public class Game extends Application implements EventHandler<InputEvent>
 
 	public void setMenu()
 	{
+		menuBackground = new Background("res/imgs/MenuBackground.PNG", 2*width/3, Color.BLACK);
+		
 		name = "Iaz";
 		menuItems = new ArrayList<>();
 		menuItems.add(Title.centerTitle(name+"'s Mission", dim/6, dim/8, width));
@@ -129,17 +133,18 @@ public class Game extends Application implements EventHandler<InputEvent>
 	
 	public void setGame() 
 	{
+		gameBackground = new Background("res/imgs/GameBackground.gif", Color.rgb(255, 255, 255, 0.5));
 		gameObjects = new ArrayList<>();
 		player = new Player(name, 100, 100);
+		player.setHealthBar(dim/60, dim/20, 3*dim/8, dim/10 - dim/60);
 		gameObjects.add(player);
-		
 	}
 	
 	public void play()
 	{
 		setPart("Play");
 		items = gameObjects;
-		background = null;
+		background = gameBackground;
 	}
 	
 	public void click()
@@ -198,16 +203,15 @@ public class Game extends Application implements EventHandler<InputEvent>
 			case "Play":
 				switch(event.getCode())
 				{
-					case C:
-						player.shortAttack();
-						break;
 					case UP:
 					case W:
 						player.jump();
 						break;
 					case I:
-						System.out.println(player.getAction());
-						player.getAction().getSprite().update();
+						System.out.println("Player Action: "+player.getAction());
+						System.out.println("Health: "+player.getHealth());
+						System.out.println("X: "+player.getX());
+						System.out.println("Y: "+player.getY());
 						break;
 					default:
 						break;
@@ -217,19 +221,25 @@ public class Game extends Application implements EventHandler<InputEvent>
 	
 	public void playerControl()
 	{
-		if(keys.get(KeyCode.RIGHT).isPressed() || keys.get(KeyCode.D).isPressed())
+		if((keys.get(KeyCode.RIGHT).isPressed() || keys.get(KeyCode.D).isPressed()) && (!player.isShortAttacking() || !player.isBottomTouch()))
 			player.move(true);
-		else if(keys.get(KeyCode.LEFT).isPressed() || keys.get(KeyCode.A).isPressed())
+		else if((keys.get(KeyCode.LEFT).isPressed() || keys.get(KeyCode.A).isPressed()) && (!player.isShortAttacking() || !player.isBottomTouch()))
 			player.move(false);
 		else
 			if(player.isWalking())
 				player.stop();
 		
 		if(keys.get(KeyCode.SPACE).isPressed() || keys.get(KeyCode.SHIFT).isPressed())
-			player.fly();
+			player.startFly();
 		else
 			if(player.isFlying())
 				player.stopFly(PlayerAction.IDLE);
+		
+		if(keys.get(KeyCode.C).isPressed())
+			player.shortAttack();
+		else
+			if(player.isShortAttacking())
+				player.stopShortAttack();
 	}
 	
 	public static void main(String[] args)
@@ -241,14 +251,10 @@ public class Game extends Application implements EventHandler<InputEvent>
 	{
 		public void handle(long time)
 		{
-			gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-			gc.setFill(Color.BLACK);
-			if(background != null)
-			gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-			gc.drawImage(background, width/6, 0, 2*width/3, height);
+			background.update(gc);
 			
-			playerControl();
-			//Check order if currentAction is being set to IDLE anywhere
+			if(part.equals("Play"))
+				playerControl();
 			
 			for(UIItem item: items)
 				item.update(gc);

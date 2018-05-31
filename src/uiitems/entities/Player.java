@@ -1,13 +1,18 @@
 package uiitems.entities;
 
 import javafx.scene.canvas.GraphicsContext;
-
+import javafx.scene.paint.Color;
 import uiitems.entities.actions.PlayerAction;
+import uiitems.ProgressBar;
 
 public class Player extends Entity {
 	
 	private String name;
 	private PlayerAction currentAction;	
+	
+	private ProgressBar healthBar;
+	
+	private int direction;
 	
 	private boolean flying;
 	private boolean walking;
@@ -19,12 +24,18 @@ public class Player extends Entity {
 		this.name = name;
 		currentAction = PlayerAction.IDLE;
 		health = 1000;
+		direction = 1;
+	}
+	
+	public void setHealthBar(int x, int y, int width, int height)
+	{
+		healthBar = new ProgressBar(1000, x, y, width, height, Color.rgb(0, 255, 0));
 	}
 	
 	@Override
 	public void draw(GraphicsContext gc)
 	{
-		gc.drawImage(currentAction.getSprite().getImage(), x, y, width, height);
+		gc.drawImage(currentAction.getSprite().getImage(), (direction==1)? x : x+width, y, direction*width, height);
 	}
 	
 	public PlayerAction getAction()
@@ -40,9 +51,6 @@ public class Player extends Entity {
 		
 		if(currentAction.isPlayOnce() && currentAction.getSprite().hasPlayedOnce() && !currentAction.getSprite().isHolding())
 		{
-			if(currentAction == PlayerAction.SHORTATTACK)
-				shortAttacking = false;
-			
 			currentAction.getSprite().reset();
 			currentAction = PlayerAction.IDLE;
 		}
@@ -52,12 +60,12 @@ public class Player extends Entity {
 			currentAction = PlayerAction.IDLE;
 		}
 		
-		if(walking && bottomTouch)
+		if(walking && bottomTouch && !shortAttacking)
 			currentAction = PlayerAction.WALK;
 		
 		if(bottomTouch)
 			jumping = false;
-		if(jumping)
+		if(jumping && !shortAttacking)
 			currentAction = PlayerAction.JUMP;
 		
 		if(flying)
@@ -68,16 +76,26 @@ public class Player extends Entity {
 		
 		this.currentAction.getSprite().update();
 		move();
+		
+		healthBar.setValue(health);
+		if(health>0)
+			healthBar.setColor(Color.rgb(255 - (int)(health/1000.0*255), (int)(health/1000.0*255), 0));
+		
+		healthBar.update(gc);
 		draw(gc);
 		
 	}
 	
 	public void move(boolean right)
-	{
-		if(right)
+	{		
+		if(right) {
 			dx = 20;
-		else
+			direction = 1;
+		}
+		else {
 			dx = -20;
+			direction = -1;
+		}
 		walking = true;
 	}
 	
@@ -88,14 +106,18 @@ public class Player extends Entity {
 		currentAction = PlayerAction.IDLE;
 	}
 	
+	public void startFly()
+	{
+		flying = true;
+	}
+	
 	public void fly() 
 	{
-		if(dy>0)
-			dy-=2;
+		if(dy>=0)
+			dy-=4;
 		jumping = false;
-		dy-=2;
+		dy-=4;
 		currentAction = PlayerAction.FLY;
-		flying = true;
 		bottomTouch = false;
 	}
 	
@@ -103,6 +125,18 @@ public class Player extends Entity {
 	{
 		currentAction = pa;
 		flying = false;
+	}
+	
+	public void shortAttack()
+	{
+		jumping = false;
+		shortAttacking = true;
+	}
+	
+	public void stopShortAttack()
+	{
+		shortAttacking = false;
+		currentAction = PlayerAction.IDLE;
 	}
 	
 	public void jump() 
@@ -113,14 +147,6 @@ public class Player extends Entity {
 			dy = -30;
 			jumping = true;
 		}
-	}
-	
-	public void shortAttack()
-	{
-		jumping = false;
-		flying = false;
-		shortAttacking = true;
-		
 	}
 	
 	public String getName()
@@ -146,6 +172,10 @@ public class Player extends Entity {
 	public boolean isShortAttacking()
 	{
 		return shortAttacking;
+	}
+
+	public ProgressBar getHealthBar() {
+		return healthBar;
 	}
 
 
