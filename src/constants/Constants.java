@@ -9,4 +9,7 @@ public class Constants {
 	public static final int dim = 600;
 	public static final int width = dim*2;
 	public static final int height = dim;
+	
+	//Health
+	public static final int healthLoss = 25;
 }

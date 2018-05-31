@@ -59,6 +59,12 @@ public class Entity extends UIItem {
 			dy=0;
 			bottomTouch = true;
 		}
+		
+		if(this.y<=0) {
+			dy = Constants.g*10;
+			health-=Constants.healthLoss;
+			y = 0;
+		}
 	}
 
 	public void gravity()

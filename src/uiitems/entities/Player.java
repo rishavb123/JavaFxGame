@@ -10,11 +10,15 @@ public class Player extends Entity {
 	private PlayerAction currentAction;	
 	
 	private boolean flying;
+	private boolean walking;
+	private boolean jumping;
+	private boolean shortAttacking;
 	
 	public Player(String name, int x, int y) {
 		super(x, y);
 		this.name = name;
 		currentAction = PlayerAction.IDLE;
+		health = 1000;
 	}
 	
 	@Override
@@ -23,14 +27,22 @@ public class Player extends Entity {
 		gc.drawImage(currentAction.getSprite().getImage(), x, y, width, height);
 	}
 	
+	public PlayerAction getAction()
+	{
+		return currentAction;
+	}
+	
 	@Override
 	public void update(GraphicsContext gc)
 	{
+		
 		actions();
 		
-		currentAction.getSprite().update();
-		if(currentAction.isPlayOnce() && currentAction.getSprite().hasPlayedOnce())
+		if(currentAction.isPlayOnce() && currentAction.getSprite().hasPlayedOnce() && !currentAction.getSprite().isHolding())
 		{
+			if(currentAction == PlayerAction.SHORTATTACK)
+				shortAttacking = false;
+			
 			currentAction.getSprite().reset();
 			currentAction = PlayerAction.IDLE;
 		}
@@ -40,12 +52,24 @@ public class Player extends Entity {
 			currentAction = PlayerAction.IDLE;
 		}
 		
-		if(dx != 0 && bottomTouch)
+		if(walking && bottomTouch)
 			currentAction = PlayerAction.WALK;
+		
+		if(bottomTouch)
+			jumping = false;
+		if(jumping)
+			currentAction = PlayerAction.JUMP;
+		
 		if(flying)
 			fly();
+		
+		if(shortAttacking)
+			currentAction = PlayerAction.SHORTATTACK;
+		
+		this.currentAction.getSprite().update();
 		move();
 		draw(gc);
+		
 	}
 	
 	public void move(boolean right)
@@ -54,42 +78,75 @@ public class Player extends Entity {
 			dx = 20;
 		else
 			dx = -20;
+		walking = true;
 	}
 	
 	public void stop()
 	{
 		dx = 0;
+		walking = false;
+		currentAction = PlayerAction.IDLE;
+	}
+	
+	public void fly() 
+	{
+		if(dy>0)
+			dy-=2;
+		jumping = false;
+		dy-=2;
+		currentAction = PlayerAction.FLY;
+		flying = true;
+		bottomTouch = false;
+	}
+	
+	public void stopFly(PlayerAction pa)
+	{
+		currentAction = pa;
+		flying = false;
 	}
 	
 	public void jump() 
 	{
-		dx = 0;
 		if(bottomTouch) 
 		{
 			bottomTouch = false;
-			currentAction = PlayerAction.JUMP;
 			dy = -30;
+			jumping = true;
 		}
+	}
+	
+	public void shortAttack()
+	{
+		jumping = false;
+		flying = false;
+		shortAttacking = true;
+		
 	}
 	
 	public String getName()
 	{
 		return name;
 	}
-
-	public void fly() 
+	
+	public boolean isFlying()
 	{
-		if(dy>0)
-			dy-=2;
-		dy-=2;
-		currentAction = PlayerAction.FLY;
-		flying = true;
+		return flying;
 	}
 	
-	public void stopFly()
+	public boolean isWalking()
 	{
-		currentAction = PlayerAction.IDLE;
-		flying = false;
+		return walking;
 	}
+	
+	public boolean isJumping()
+	{
+		return jumping;
+	}
+	
+	public boolean isShortAttacking()
+	{
+		return shortAttacking;
+	}
+
 
 }

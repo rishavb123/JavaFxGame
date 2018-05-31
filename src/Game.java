@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
 
 import uiitems.*;
 import uiitems.entities.*;
+import uiitems.entities.actions.PlayerAction;
 import uiitems.menu.*;
 
 import constants.Constants;
@@ -40,7 +41,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 	
 	private HashMap<KeyCode, Key> keys;
 	private static final KeyCode[] keyCodes = {
-			KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.SPACE, KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.SHIFT, KeyCode.CONTROL, KeyCode.ENTER
+			KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.SPACE, KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.SHIFT, KeyCode.CONTROL, KeyCode.ENTER
 	};
 	
 	private Image background;
@@ -198,10 +199,15 @@ public class Game extends Application implements EventHandler<InputEvent>
 				switch(event.getCode())
 				{
 					case C:
-//						player.attack();
+						player.shortAttack();
 						break;
 					case UP:
+					case W:
 						player.jump();
+						break;
+					case I:
+						System.out.println(player.getAction());
+						player.getAction().getSprite().update();
 						break;
 					default:
 						break;
@@ -211,17 +217,19 @@ public class Game extends Application implements EventHandler<InputEvent>
 	
 	public void playerControl()
 	{
-		if(keys.get(KeyCode.RIGHT).isPressed())
+		if(keys.get(KeyCode.RIGHT).isPressed() || keys.get(KeyCode.D).isPressed())
 			player.move(true);
-		else if(keys.get(KeyCode.LEFT).isPressed())
+		else if(keys.get(KeyCode.LEFT).isPressed() || keys.get(KeyCode.A).isPressed())
 			player.move(false);
 		else
-			player.stop();
+			if(player.isWalking())
+				player.stop();
 		
-		if(keys.get(KeyCode.SPACE).isPressed())
+		if(keys.get(KeyCode.SPACE).isPressed() || keys.get(KeyCode.SHIFT).isPressed())
 			player.fly();
 		else
-			player.stopFly();
+			if(player.isFlying())
+				player.stopFly(PlayerAction.IDLE);
 	}
 	
 	public static void main(String[] args)
@@ -240,6 +248,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 			gc.drawImage(background, width/6, 0, 2*width/3, height);
 			
 			playerControl();
+			//Check order if currentAction is being set to IDLE anywhere
 			
 			for(UIItem item: items)
 				item.update(gc);

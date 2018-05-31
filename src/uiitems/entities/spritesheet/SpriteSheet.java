@@ -12,6 +12,7 @@ public class SpriteSheet
 {
 
 	private static final long delay = 50;
+	private static final long longDelay = 200;
 	private static final int spriteWidth = 120;
 	private static final int spriteHeight = 120;
 	
@@ -23,8 +24,9 @@ public class SpriteSheet
 	private boolean playedOnce;
 	private boolean hold;
 	private boolean holding;
+	private boolean useLongDelay;
 		
-	public SpriteSheet(String path, int start, int stop, boolean hold)
+	public SpriteSheet(String path, int start, int stop, boolean hold, boolean useLongDelay)
 	{
 		
 		try {
@@ -35,7 +37,9 @@ public class SpriteSheet
 		
 		this.start = start;
 		this.hold = hold;
+		this.useLongDelay = useLongDelay;
 		
+		holding = false;
 		time = System.nanoTime();
 		frames = new BufferedImage[stop-start];
 		currentFrame = 0;
@@ -62,13 +66,13 @@ public class SpriteSheet
 	
 	public void update()
 	{
-		if((System.nanoTime() - time) / 1000000 > delay)
+		if(((System.nanoTime() - time) / 1000000 > delay && !useLongDelay) || ((System.nanoTime() - time) / 1000000 > longDelay && useLongDelay))
 		{
 			currentFrame++;
 			time = System.nanoTime();
 		}
 		
-		if(currentFrame == frames.length)
+		if(currentFrame == this.frames.length)
 		{
 			if(hold) {
 				currentFrame--;
@@ -91,6 +95,11 @@ public class SpriteSheet
 	public boolean hasPlayedOnce()
 	{
 		return playedOnce;
+	}
+	
+	public String toString()
+	{
+		return currentFrame+" "+frames.length;
 	}
 
 }
