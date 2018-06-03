@@ -1,14 +1,22 @@
 package uiitems.entities;
 
+import constants.Constants;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import uiitems.entities.actions.PlayerAction;
+import uiitems.Laser;
 import uiitems.ProgressBar;
 
 public class Player extends Entity {
-	
+		
 	private String name;
 	private PlayerAction currentAction;	
+	
+	private int rx;
+	private int ry;
+	private int rwidth;
+	private int rheight;
 	
 	private ProgressBar healthBar;
 	
@@ -18,13 +26,36 @@ public class Player extends Entity {
 	private boolean walking;
 	private boolean jumping;
 	private boolean shortAttacking;
+	private boolean sheilding;
+	private boolean longAttacking;
+	
+	private int longAttackPointer;
+	private double longAttackPointerSpeed;
 	
 	public Player(String name, int x, int y) {
 		super(x, y);
 		this.name = name;
 		currentAction = PlayerAction.IDLE;
-		health = 1000;
+		maxHealth = 1000;
+		health = maxHealth;
 		direction = 1;
+		longAttackPointer = x+width;
+
+		setRealDimensions();
+	}
+	
+	private void setRealDimensions() 
+	{
+		rx = (int)(x+width/4.0);
+		ry = (int)(y+height*3.0/120);
+		rwidth = (int)(width/4.0);
+		rheight = (int)(height*88.0/120);		
+	}
+	
+	private void setDrawableDimensions()
+	{
+		x = (int)(rx - width/4.0);
+		y = (int)(ry-height*3.0/120);
 	}
 	
 	public void setHealthBar(int x, int y, int width, int height)
@@ -35,7 +66,32 @@ public class Player extends Entity {
 	@Override
 	public void draw(GraphicsContext gc)
 	{
-		gc.drawImage(currentAction.getSprite().getImage(), (direction==1)? x : x+width, y, direction*width, height);
+		if(longAttacking) {
+			gc.setFill(Color.rgb(0,255,255,0.5));
+			gc.fillRect(longAttackPointer, 0, Constants.dim/20, Constants.dim);
+		}
+		gc.drawImage(currentAction.getSprite().getImage(), (direction==1)? x : x + width - rwidth, y, direction*width, height);
+	}
+	
+	@Override
+	public void actions() 
+	{
+		gravity();
+		if(this.ry+this.rheight>=Constants.height && dy>0)
+		{
+			this.ry = Constants.height - this.rheight;
+			dy=0;
+			bottomTouch = true;
+		}
+		
+		if(this.ry<=0) {
+			dy = Constants.g*10;
+			health-=2*Constants.healthLoss;
+			ry = 0;
+		}
+		
+		setDrawableDimensions();
+		
 	}
 	
 	public PlayerAction getAction()
@@ -72,14 +128,30 @@ public class Player extends Entity {
 			fly();
 		
 		if(shortAttacking)
-			currentAction = PlayerAction.SHORTATTACK;
+			shortAttack();
+		
+		if(sheilding)
+			sheild();
+		
+		if(longAttacking) 
+			longAttack();
+		else
+			longAttackPointer = (direction==-1)? x - Constants.dim/20  : x + width;
 		
 		this.currentAction.getSprite().update();
 		move();
 		
+		if(!(flying||walking||jumping||shortAttacking||sheilding||dx!=0||dy!=0) && health<maxHealth)
+		{
+			if((int)(Math.random()*2) == 0)
+				health++;
+		}
+		
 		healthBar.setValue(health);
-		if(health>0)
-			healthBar.setColor(Color.rgb(255 - (int)(health/1000.0*255), (int)(health/1000.0*255), 0));
+		if(health>0 && health<=maxHealth)
+			healthBar.setColor(Color.rgb(255 - (int)((double)health/maxHealth*255), (int)((double)health/maxHealth*255), 0));
+		
+		setRealDimensions();
 		
 		healthBar.update(gc);
 		draw(gc);
@@ -119,18 +191,26 @@ public class Player extends Entity {
 		dy-=4;
 		currentAction = PlayerAction.FLY;
 		bottomTouch = false;
+		health--;
 	}
 	
-	public void stopFly(PlayerAction pa)
+	public void stopFly()
 	{
-		currentAction = pa;
+		currentAction = PlayerAction.IDLE;
 		flying = false;
+	}
+	
+	public void startShortAttack()
+	{
+		jumping = false;
+		shortAttacking = true;
 	}
 	
 	public void shortAttack()
 	{
-		jumping = false;
-		shortAttacking = true;
+		currentAction = PlayerAction.SHORTATTACK;
+		sheilding = false;
+		
 	}
 	
 	public void stopShortAttack()
@@ -139,19 +219,101 @@ public class Player extends Entity {
 		currentAction = PlayerAction.IDLE;
 	}
 	
+	public void startSheild()
+	{
+		sheilding = true;
+	}
+	
+	public void sheild()
+	{
+		dx = 0;
+		currentAction = PlayerAction.SHEILD;
+		health--;
+	}
+	
+	public void stopSheild()
+	{
+		PlayerAction.SHEILD.getSprite().reset();
+		sheilding = false;
+		currentAction = PlayerAction.IDLE;
+	}
+	
+	public void startLongAttack()
+	{
+		longAttacking = true;
+	}
+	
+	public void longAttack()
+	{
+		longAttackPointerSpeed+=0.5;
+		currentAction = PlayerAction.LONGATTACK;
+		longAttackPointer+=(int)(Constants.dim/1200.0*longAttackPointerSpeed*direction);
+		dx = 0;
+	}
+	
+	public Laser stopLongAttack()
+	{
+		longAttackPointerSpeed = 0;
+		PlayerAction.LONGATTACK.getSprite().reset();
+		longAttacking = false;
+		currentAction = PlayerAction.LONGATTACKDOWN;
+		return new Laser(longAttackPointer, 0, 0, Constants.dim/6);
+	}
+	
 	public void jump() 
 	{
 		if(bottomTouch) 
 		{
 			bottomTouch = false;
-			dy = -30;
+			dy = -25;
 			jumping = true;
 		}
+	}
+	
+	@Override
+	public Rectangle2D getRect()
+	{
+		return new Rectangle2D(rx, ry, rwidth, rheight);
 	}
 	
 	public String getName()
 	{
 		return name;
+	}
+	
+	public int getDirection()
+	{
+		return direction;
+	}
+	
+	public int getWidth()
+	{
+		return width;
+	}
+	
+	public int getHeight()
+	{
+		return height;
+	}
+	
+	public int getRx()
+	{
+		return rx;
+	}
+	
+	public int getRy()
+	{
+		return ry;
+	}
+	
+	public int getRWidth()
+	{
+		return rwidth;
+	}
+	
+	public int getRHeight()
+	{
+		return rheight;
 	}
 	
 	public boolean isFlying()
@@ -172,6 +334,16 @@ public class Player extends Entity {
 	public boolean isShortAttacking()
 	{
 		return shortAttacking;
+	}
+	
+	public boolean isSheilding()
+	{
+		return sheilding;
+	}
+
+	public boolean isLongAttacking() 
+	{
+		return longAttacking;
 	}
 
 	public ProgressBar getHealthBar() {

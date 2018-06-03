@@ -5,11 +5,12 @@ import uiitems.entities.spritesheet.SpriteSheet;
 public enum PlayerAction {
 	IDLE("IDLE", 0, 0, 1, false, false, false),
 	WALK("WALK", 1, 1, 4, false, false, false),
-	RANGEATTACK("RANGEATTACK", 2, 5, 7, true, true, false),
-	JUMP("JUMP", 3, 12, 1, true, true, false),
-	FLY("FLY", 4, 11, 3, true, true, false),
-	SHEILD("SHEILD", 5, 15, 4, true, true, false),
-	SHORTATTACK("SHORTATTACK", 6, 20, 1, true, true, true);
+	LONGATTACK("LONGATTACK", 2, 5, 4, true, true, false),
+	LONGATTACKDOWN("LONGATTACKDOWN", 3, 9, 2, true, false, false),
+	JUMP("JUMP", 4, 12, 1, true, true, false),
+	FLY("FLY", 5, 11, 3, true, true, false),
+	SHEILD("SHEILD", 6, 15, 3, true, true, false),
+	SHORTATTACK("SHORTATTACK", 7, 20, 1, true, true, true);
 		
 	private String action;
 	private int index;

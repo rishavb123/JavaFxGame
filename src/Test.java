@@ -1,3 +1,7 @@
+import java.io.File;
+
+import javax.imageio.ImageIO;
+
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -5,6 +9,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
+import uiitems.entities.actions.*;
 
 public class Test extends Application {
 
@@ -27,9 +33,12 @@ public class Test extends Application {
 		
 		stage.show();
 		
+		ImageIO.write(PlayerAction.IDLE.getSprite().getBufferedImage().getSubimage(30, 3, 30, 88), "jpg", new File("test.jpg"));
 		
-		Image background = new Image("game/MenuBackground.png");
+		Image background = new Image("res/imgs/MenuBackground.PNG");
 		gc.drawImage(background, 0, 0, canvas.getWidth(), canvas.getHeight());
+		
+		System.exit(0);
 		
 	}
 

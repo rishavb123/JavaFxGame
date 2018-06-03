@@ -10,15 +10,17 @@ import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 import uiitems.Background;
+import uiitems.Laser;
 import uiitems.UIItem;
+import uiitems.entities.Entity;
 import uiitems.entities.Player;
-import uiitems.entities.actions.PlayerAction;
 import uiitems.menu.MenuItem;
 import uiitems.menu.Title;
 
@@ -53,7 +55,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 	private ArrayList<UIItem> menuItems;
 	private int selectedIndex;
 	
-	private ArrayList<UIItem> gameObjects;
+	private static ArrayList<UIItem> gameObjects;
 	
 	private Player player;
 	String name;
@@ -133,11 +135,14 @@ public class Game extends Application implements EventHandler<InputEvent>
 	
 	public void setGame() 
 	{
-		gameBackground = new Background("res/imgs/GameBackground.gif", Color.rgb(255, 255, 255, 0.5));
+		gameBackground = new Background("res/imgs/GameBackground.gif", Color.rgb(255, 255, 255, 0.25));
 		gameObjects = new ArrayList<>();
 		player = new Player(name, 100, 100);
 		player.setHealthBar(dim/60, dim/20, 3*dim/8, dim/10 - dim/60);
 		gameObjects.add(player);
+		Player testPlayer = new Player(name, 500, 100);
+		testPlayer.setHealthBar(width - dim/60 - 3*dim/8, dim/20, 3*dim/8, dim/10 - dim/60);
+		gameObjects.add(testPlayer);
 	}
 	
 	public void play()
@@ -213,10 +218,23 @@ public class Game extends Application implements EventHandler<InputEvent>
 						System.out.println("X: "+player.getX());
 						System.out.println("Y: "+player.getY());
 						break;
+					
+					case L:
+						gameObjects.add(new Laser(0,0,0,10));
+					
+					case P:
+						player.getAction().getSprite().saveCurrentFrame();
+						
 					default:
 						break;
 				}
 		}
+	}
+	
+	public void playerActions()
+	{
+		playerControl();
+		attackCheck();
 	}
 	
 	public void playerControl()
@@ -233,13 +251,74 @@ public class Game extends Application implements EventHandler<InputEvent>
 			player.startFly();
 		else
 			if(player.isFlying())
-				player.stopFly(PlayerAction.IDLE);
+				player.stopFly();
 		
 		if(keys.get(KeyCode.C).isPressed())
-			player.shortAttack();
+			player.startShortAttack();
 		else
 			if(player.isShortAttacking())
 				player.stopShortAttack();
+		
+		if(keys.get(KeyCode.Z).isPressed())
+			player.startSheild();
+		else
+			if(player.isSheilding())
+				player.stopSheild();
+		
+		if(keys.get(KeyCode.X).isPressed())
+			player.startLongAttack();
+		else
+			if(player.isLongAttacking())
+				gameObjects.add(player.stopLongAttack());
+	}
+	
+	public void attackCheck()
+	{
+		for(int x=0; x < gameObjects.size(); x++)
+		{
+			if(gameObjects.get(x) instanceof Player)
+			{
+				Player p = (Player)gameObjects.get(x);
+				if(p.isShortAttacking())
+				{
+					int d = p.getDirection();
+					Rectangle2D r = new Rectangle2D(p.getRx() + ((d == 1)? p.getRWidth() : -1.3*p.getRWidth()), p.getRy(), 1.3*p.getRWidth(), p.getRHeight());
+					gc.fillRect(r.getMinX(), r.getMinY(), r.getWidth(), r.getHeight());
+					for(int y=0; y < gameObjects.size(); y++)
+					{
+						if(gameObjects.get(y) instanceof Entity && gameObjects.get(y) != p && r.intersects(((Entity)gameObjects.get(y)).getRect()))
+						{
+							((Entity)gameObjects.get(y)).damage(1 + Math.abs(p.getDx()));
+							
+						}
+					}
+				}
+			}
+			if(gameObjects.get(x) instanceof Laser)
+			{
+				Laser laser = (Laser)gameObjects.get(x);
+				if(laser.getY() > height)
+				{
+					gameObjects.remove(x);
+					x--;
+					continue;
+				}
+
+				boolean hit = false;
+				for(int y=0;y<gameObjects.size();y++)
+					if(gameObjects.get(y) instanceof Entity && laser.getRect().intersects(((Entity)gameObjects.get(y)).getRect()))
+					{
+						((Entity)gameObjects.get(y)).damage((int)(Math.sqrt(laser.getDx()*laser.getDx()+laser.getDy()*laser.getDy()))*10);
+						hit = true;
+					}
+				
+				if(hit) 
+				{
+					gameObjects.remove(x);
+					x--;
+				}
+			}
+		}
 	}
 	
 	public static void main(String[] args)
@@ -254,11 +333,12 @@ public class Game extends Application implements EventHandler<InputEvent>
 			background.update(gc);
 			
 			if(part.equals("Play"))
-				playerControl();
+			{
+				playerActions();
+			}
 			
 			for(UIItem item: items)
 				item.update(gc);
-			
 		}
 	}
 	

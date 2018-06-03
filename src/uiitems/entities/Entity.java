@@ -1,5 +1,6 @@
 package uiitems.entities;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -13,6 +14,7 @@ public class Entity extends UIItem {
 	protected int width;
 	protected int height;
 	protected int health;
+	protected int maxHealth;
 	protected boolean bottomTouch;
 	
 	public Entity(int x, int y) 
@@ -23,7 +25,13 @@ public class Entity extends UIItem {
 		dx = 0;
 		this.width = Constants.dim/5;
 		this.height = Constants.dim/5;
-		health = 100;
+		maxHealth = 100;
+		health = maxHealth;
+	}
+	
+	public Rectangle2D getRect()
+	{
+		return new Rectangle2D(x, y, width, height);
 	}
 	
 	public Entity(int x, int y, int dy, int dx) 
@@ -39,6 +47,16 @@ public class Entity extends UIItem {
 	public int getHealth()
 	{
 		return health;
+	}
+	
+	public int getDx()
+	{
+		return dx;
+	}
+	
+	public int getDy()
+	{
+		return dy;
 	}
 	
 	public boolean isBottomTouch()
@@ -72,6 +90,15 @@ public class Entity extends UIItem {
 	public void gravity()
 	{
 		dy+=Constants.g;
+	}
+	
+	public void damage(int i)
+	{
+		health -= i;
+		if(i > maxHealth/4)
+		{
+			dy = -20;
+		}
 	}
 	
 	@Override

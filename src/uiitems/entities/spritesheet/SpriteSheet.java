@@ -1,6 +1,7 @@
 package uiitems.entities.spritesheet;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -54,9 +55,23 @@ public class SpriteSheet
 		}
 	}
 	
+	public void saveCurrentFrame()
+	{
+		try {
+			ImageIO.write(frames[currentFrame], "png", new File("image.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public Image getImage()
 	{
 		return SwingFXUtils.toFXImage(frames[currentFrame], null);
+	}
+	
+	public BufferedImage getBufferedImage()
+	{
+		return frames[currentFrame];
 	}
 	
 	public boolean isHolding()
