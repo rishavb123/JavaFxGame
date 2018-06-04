@@ -14,8 +14,8 @@ public class SpriteSheet
 
 	private static final long delay = 50;
 	private static final long longDelay = 700;
-	private static final int spriteWidth = 120;
-	private static final int spriteHeight = 120;
+	public static final int spriteWidth = 120;
+	public static final int spriteHeight = 120;
 	
 	private BufferedImage[] frames;
 	private int currentFrame;
@@ -67,6 +67,11 @@ public class SpriteSheet
 	public Image getImage()
 	{
 		return SwingFXUtils.toFXImage(frames[currentFrame], null);
+	}
+	
+	public static Image getImage(BufferedImage bi, int x, int y, int width, int height)
+	{
+		return SwingFXUtils.toFXImage(bi.getSubimage(x, y, width, height), null);
 	}
 	
 	public BufferedImage getBufferedImage()

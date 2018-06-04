@@ -76,7 +76,9 @@ public class Player extends Entity {
 	@Override
 	public void actions() 
 	{
-		gravity();
+		
+		if(!bottomTouch)
+			gravity();
 		if(this.ry+this.rheight>=Constants.height && dy>0)
 		{
 			this.ry = Constants.height - this.rheight;
@@ -97,6 +99,13 @@ public class Player extends Entity {
 	public PlayerAction getAction()
 	{
 		return currentAction;
+	}
+	
+	@Override
+	public void bottomTouched(int yy) {
+		this.bottomTouch = true;
+		this.ry = yy;
+		setDrawableDimensions();
 	}
 	
 	@Override

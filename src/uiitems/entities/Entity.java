@@ -44,6 +44,36 @@ public class Entity extends UIItem {
 		this.height = Constants.dim/10;
 	}
 	
+	public int getWidth()
+	{
+		return width;
+	}
+	
+	public int getHeight()
+	{
+		return height;
+	}
+	
+	public int getRWidth()
+	{
+		return width;
+	}
+	
+	public int getRHeight()
+	{
+		return height;
+	}
+	
+	public int getRx()
+	{
+		return x;
+	}
+	
+	public int getRy()
+	{
+		return y;
+	}
+	
 	public int getHealth()
 	{
 		return health;
@@ -72,7 +102,8 @@ public class Entity extends UIItem {
 	
 	public void actions() 
 	{
-		gravity();
+		if(!bottomTouch)
+			gravity();
 		if(this.y+this.height>=Constants.height && dy>0)
 		{
 			this.y = Constants.height - this.height;
@@ -113,6 +144,22 @@ public class Entity extends UIItem {
 	public void draw(GraphicsContext gc) {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(x, y, width, height);
+	}
+
+	public void bottomTouched(int yy) {
+		this.bottomTouch = true;
+		this.y = yy;
+	}
+
+	public void setDy(int i) {
+		dy = i;
+	}
+	public void setDx(int i) {
+		dx = i;
+	}
+
+	public void setBottomTouch(boolean b) {
+		bottomTouch = b;
 	}
 
 }

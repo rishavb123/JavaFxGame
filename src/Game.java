@@ -12,13 +12,17 @@ import javafx.scene.input.KeyEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
+import javax.imageio.ImageIO;
+
 import uiitems.Background;
 import uiitems.Laser;
 import uiitems.UIItem;
+import uiitems.blocks.Block;
 import uiitems.entities.Entity;
 import uiitems.entities.Player;
 import uiitems.menu.MenuItem;
@@ -65,6 +69,12 @@ public class Game extends Application implements EventHandler<InputEvent>
 		this.stage = stage;
 		
 		setPart("Game Menu");
+		
+		try {
+			Block.blockSheet = ImageIO.read(getClass().getResourceAsStream("uiitems/blocks/blockImages/BlockSheet.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		Group root = new Group();
 		canvas = new Canvas(width, height);
@@ -143,6 +153,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 		Player testPlayer = new Player(name, 500, 100);
 		testPlayer.setHealthBar(width - dim/60 - 3*dim/8, dim/20, 3*dim/8, dim/10 - dim/60);
 		gameObjects.add(testPlayer);
+		gameObjects.add(new Block(100, 300, 0, 0));
 	}
 	
 	public void play()
@@ -231,10 +242,10 @@ public class Game extends Application implements EventHandler<InputEvent>
 		}
 	}
 	
-	public void playerActions()
+	public void actions()
 	{
 		playerControl();
-		attackCheck();
+		itemsCheck();
 	}
 	
 	public void playerControl()
@@ -272,10 +283,11 @@ public class Game extends Application implements EventHandler<InputEvent>
 				gameObjects.add(player.stopLongAttack());
 	}
 	
-	public void attackCheck()
+	public void itemsCheck()
 	{
 		for(int x=0; x < gameObjects.size(); x++)
 		{
+			
 			if(gameObjects.get(x) instanceof Player)
 			{
 				Player p = (Player)gameObjects.get(x);
@@ -283,16 +295,37 @@ public class Game extends Application implements EventHandler<InputEvent>
 				{
 					int d = p.getDirection();
 					Rectangle2D r = new Rectangle2D(p.getRx() + ((d == 1)? p.getRWidth() : -1.3*p.getRWidth()), p.getRy(), 1.3*p.getRWidth(), p.getRHeight());
-					gc.fillRect(r.getMinX(), r.getMinY(), r.getWidth(), r.getHeight());
 					for(int y=0; y < gameObjects.size(); y++)
 					{
 						if(gameObjects.get(y) instanceof Entity && gameObjects.get(y) != p && r.intersects(((Entity)gameObjects.get(y)).getRect()))
 						{
-							((Entity)gameObjects.get(y)).damage(1 + Math.abs(p.getDx()));
+							((Entity)gameObjects.get(y)).damage(1 + Math.abs(p.getDx()*3));
 							
 						}
 					}
 				}
+			}
+			if(gameObjects.get(x) instanceof Entity)
+			{
+				Entity p = (Entity)gameObjects.get(x);
+				boolean hit = false;
+				for(int y=0;y<gameObjects.size();y++)
+				{
+					if(gameObjects.get(y) instanceof Block)
+					{
+						Block b = (Block)gameObjects.get(y);
+						if(b.getRect().intersects(p.getRect()))
+						{
+							b.hit(p);
+							hit = true;
+						}
+						
+					}
+						
+				}
+				
+				if(!hit)
+					p.setBottomTouch(false);
 			}
 			if(gameObjects.get(x) instanceof Laser)
 			{
@@ -305,12 +338,17 @@ public class Game extends Application implements EventHandler<InputEvent>
 				}
 
 				boolean hit = false;
-				for(int y=0;y<gameObjects.size();y++)
+				for(int y=0;y<gameObjects.size();y++) {
 					if(gameObjects.get(y) instanceof Entity && laser.getRect().intersects(((Entity)gameObjects.get(y)).getRect()))
 					{
 						((Entity)gameObjects.get(y)).damage((int)(Math.sqrt(laser.getDx()*laser.getDx()+laser.getDy()*laser.getDy()))*10);
 						hit = true;
 					}
+					else if(gameObjects.get(y) instanceof Block && laser.getRect().intersects(((Block)gameObjects.get(y)).getRect()))
+					{
+						hit = true;
+					}
+				}
 				
 				if(hit) 
 				{
@@ -334,7 +372,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 			
 			if(part.equals("Play"))
 			{
-				playerActions();
+				actions();
 			}
 			
 			for(UIItem item: items)
