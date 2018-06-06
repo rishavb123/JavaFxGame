@@ -23,8 +23,11 @@ import uiitems.Background;
 import uiitems.Laser;
 import uiitems.UIItem;
 import uiitems.blocks.Block;
+import uiitems.blockGroups.BlockGroup;
+import uiitems.blockGroups.Floor;
 import uiitems.entities.Entity;
 import uiitems.entities.Player;
+import uiitems.entities.Enemy;
 import uiitems.menu.MenuItem;
 import uiitems.menu.Title;
 
@@ -62,6 +65,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 	private static ArrayList<UIItem> gameObjects;
 	
 	private Player player;
+	private Enemy enemy;
 	String name;
 
 	public void start(Stage stage)
@@ -145,7 +149,8 @@ public class Game extends Application implements EventHandler<InputEvent>
 	
 	public void setGame() 
 	{
-		gameBackground = new Background("res/imgs/GameBackground.gif", Color.rgb(255, 255, 255, 0.25));
+		int num = (int)(Math.random()*4)+1;
+		gameBackground = new Background("res/imgs/GameBackground"+num+".gif", Color.rgb(255, 255, 255, 0.25));
 		gameObjects = new ArrayList<>();
 		player = new Player(name, 100, 100);
 		player.setHealthBar(dim/60, dim/20, 3*dim/8, dim/10 - dim/60);
@@ -153,7 +158,9 @@ public class Game extends Application implements EventHandler<InputEvent>
 		Player testPlayer = new Player(name, 500, 100);
 		testPlayer.setHealthBar(width - dim/60 - 3*dim/8, dim/20, 3*dim/8, dim/10 - dim/60);
 		gameObjects.add(testPlayer);
-		gameObjects.add(new Block(100, 300, 0, 0));
+		enemy = new Enemy(400,100);
+		gameObjects.add(enemy);
+		gameObjects.add(new Floor(0, 3));
 	}
 	
 	public void play()
@@ -299,7 +306,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 					{
 						if(gameObjects.get(y) instanceof Entity && gameObjects.get(y) != p && r.intersects(((Entity)gameObjects.get(y)).getRect()))
 						{
-							((Entity)gameObjects.get(y)).damage(1 + Math.abs(p.getDx()*3));
+							((Entity)gameObjects.get(y)).damage(1 + 2*(int)(Math.sqrt(p.getDx()*p.getDx()+p.getDy()*p.getDy())));
 							
 						}
 					}
@@ -321,11 +328,25 @@ public class Game extends Application implements EventHandler<InputEvent>
 						}
 						
 					}
+					
+					if(gameObjects.get(y) instanceof BlockGroup)
+					{
+						for(Block b : ((BlockGroup)gameObjects.get(y)).getBlockList())
+							if(b.getRect().intersects(p.getRect()))
+							{
+								b.hit(p);
+								hit = true;
+							}
+					}
 						
 				}
 				
-				if(!hit)
+				if(!hit) {
 					p.setBottomTouch(false);
+					p.setTopTouch(false);
+					p.setLeftTouch(false);
+					p.setRightTouch(false);
+				}
 			}
 			if(gameObjects.get(x) instanceof Laser)
 			{
@@ -377,6 +398,9 @@ public class Game extends Application implements EventHandler<InputEvent>
 			
 			for(UIItem item: items)
 				item.update(gc);
+			
+			System.out.println(enemy);
+			
 		}
 	}
 	

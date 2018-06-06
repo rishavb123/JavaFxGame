@@ -33,7 +33,7 @@ public class Test extends Application {
 		
 		stage.show();
 		
-		ImageIO.write(PlayerAction.IDLE.getSprite().getBufferedImage().getSubimage(30, 3, 30, 88), "jpg", new File("test.jpg"));
+		ImageIO.write(EnemyAction.IDLE.getSprite().getBufferedImage().getSubimage(42, 3, 53, 102), "jpg", new File("test.jpg"));
 		
 		Image background = new Image("res/imgs/MenuBackground.PNG");
 		gc.drawImage(background, 0, 0, canvas.getWidth(), canvas.getHeight());

@@ -18,8 +18,8 @@ public class Block extends UIItem {
 	public static BufferedImage blockSheet;
 	
 	private Image image;
-	
-	public Block(int x, int y, int row, int col) {
+		
+	public Block(int x, int y, int col, int row) {
 		this.x = x;
 		this.y = y;
 		
@@ -35,18 +35,40 @@ public class Block extends UIItem {
 		gc.drawImage(image, x, y, Constants.dim/10, Constants.dim/10);
 	}
 	
-	public void landOn(Entity e) 
+	public void hitFromAbove(Entity e) 
 	{
-		System.out.println("landed");
 		e.bottomTouched(y - e.getRHeight() + 1);
 		e.setDy(0);
 	}
 	
-	public void hit(Entity e)
+	public void hitFromUnder(Entity e)
 	{
-		if(e.getDy()>0) {
-			landOn(e);
-		}
+		e.setDy(0);
+		e.topTouched(y+Constants.dim/10);
+	}
+	
+	public void hitFromLeft(Entity e)
+	{
+		e.setDx(0);
+		e.leftTouched(x - e.getRWidth() + 1);
+	}
+	
+	public void hitFromRight(Entity e)
+	{
+		e.setDx(0);
+		e.rightTouched(x + Constants.dim/10 -1);
+	}
+	
+	public final void hit(Entity e)
+	{		
+		if(e.getRx() + e.getRWidth() < x + e.getDx() + 1 && e.getRy() + e.getRWidth() > y)
+			hitFromLeft(e);
+		else if(e.getRx() > x + Constants.dim/10 + e.getDx() && e.getRy() + e.getRWidth() > y)
+			hitFromRight(e);
+		else if(e.getDy()>0 && e.getRy() <= y + Constants.dim/10 - e.getRHeight()) 
+			hitFromAbove(e);
+		else if(e.getDy()<0 && e.getRy() > y)
+			hitFromUnder(e);
 	}
 	
 	public Rectangle2D getRect()

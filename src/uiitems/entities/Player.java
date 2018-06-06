@@ -109,6 +109,28 @@ public class Player extends Entity {
 	}
 	
 	@Override
+	public void topTouched(int yy) {
+		this.topTouch = true;
+		this.ry = yy;
+		setDrawableDimensions();
+	}
+	
+	@Override
+	public void leftTouched(int x) {
+		this.leftTouch = true;
+		this.rx = x;
+		setDrawableDimensions();
+	}
+	
+	@Override
+	public void rightTouched(int x)
+	{
+		this.rightTouch = true;
+		this.rx = x;
+		setDrawableDimensions();
+	}
+	
+	@Override
 	public void update(GraphicsContext gc)
 	{
 		
@@ -130,11 +152,15 @@ public class Player extends Entity {
 		
 		if(bottomTouch)
 			jumping = false;
-		if(jumping && !shortAttacking)
-			currentAction = PlayerAction.JUMP;
 		
-		if(flying)
-			fly();
+		if(!topTouch)
+		{
+			if(jumping && !shortAttacking)
+				currentAction = PlayerAction.JUMP;
+			
+			if(flying)
+				fly();
+		}
 		
 		if(shortAttacking)
 			shortAttack();
@@ -169,15 +195,16 @@ public class Player extends Entity {
 	
 	public void move(boolean right)
 	{		
-		if(right) {
+		if(right && !rightTouch) {
 			dx = 20;
 			direction = 1;
+			walking = true;
 		}
-		else {
+		else if(!leftTouch){
 			dx = -20;
 			direction = -1;
+			walking = true;
 		}
-		walking = true;
 	}
 	
 	public void stop()
@@ -277,6 +304,15 @@ public class Player extends Entity {
 			dy = -25;
 			jumping = true;
 		}
+	}
+	
+	@Override
+	public void damage(int i)
+	{
+		if(sheilding)
+			health-=i/2;
+		else
+			health-=i;
 	}
 	
 	@Override
