@@ -398,9 +398,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 			
 			for(UIItem item: items)
 				item.update(gc);
-			
-			System.out.println(enemy);
-			
+						
 		}
 	}
 	
