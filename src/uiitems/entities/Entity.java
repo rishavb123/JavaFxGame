@@ -92,6 +92,16 @@ public class Entity extends UIItem {
 		return rightTouch;
 	}
 
+	public boolean isAlive()
+	{
+		return health > 0;
+	}
+	
+	public void die()
+	{
+		health = 0;
+	}
+	
 	public void move()
 	{
 		x+=dx;

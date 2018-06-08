@@ -160,7 +160,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 		Player testPlayer = new Player(name, 800, 100);
 		testPlayer.setHealthBar(width - dim/60 - 3*dim/8, dim/20, 3*dim/8, dim/10 - dim/60);
 		gameObjects.add(testPlayer);
-		enemy = new Enemy(400,100);
+		enemy = new Enemy(800,100, player, gameObjects);
 		gameObjects.add(enemy);
 		gameObjects.add(new Floor(0, 3));
 	}
@@ -384,6 +384,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 				
 				if(((Entity)gameObjects.get(x)).getHealth() <= 0 || gameObjects.get(x).getX()+((Entity)gameObjects.get(x)).getWidth()<0 || gameObjects.get(x).getX()>Constants.width)
 				{
+					((Entity)gameObjects.get(x)).die();
 					gameObjects.remove(x);
 					x--;
 					continue;
@@ -489,14 +490,10 @@ public class Game extends Application implements EventHandler<InputEvent>
 		public void handle(long time)
 		{
 			background.update(gc);
-			
 			if(part.equals("Play"))
-			{
 				actions();
-			}
-			
-			for(UIItem item: items)
-				item.update(gc);
+			for(int x=0;x<items.size();x++)
+				items.get(x).update(gc);
 						
 		}
 	}

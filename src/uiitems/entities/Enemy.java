@@ -1,5 +1,7 @@
 package uiitems.entities;
 
+import java.util.ArrayList;
+
 import constants.Constants;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -7,10 +9,14 @@ import javafx.scene.paint.Color;
 import uiitems.Grenade;
 import uiitems.Laser;
 import uiitems.ProgressBar;
+import uiitems.UIItem;
 import uiitems.entities.actions.EnemyAction;
+import uiitems.entities.artificialIntelligence.EnemyAI;
 
 public class Enemy extends Entity {
 
+	public static int jumpSpeed = Constants.dim/20;
+	
 	protected EnemyAction currentAction;
 	protected int direction;
 	
@@ -22,13 +28,20 @@ public class Enemy extends Entity {
 	protected boolean walking;
 	
 	protected ProgressBar healthBar;
+	protected EnemyAI ai;
 	
-	public Enemy(int x, int y) {
+	public static int getJumpMaxHeight(int y)
+	{
+		return y - (jumpSpeed*jumpSpeed/(2*Constants.g));
+	}
+	
+	public Enemy(int x, int y, Player target, ArrayList<UIItem> list) {
 		super(x, y);
 		currentAction = EnemyAction.IDLE;
 		direction = 1;
 		bottomTouch = false;
 		healthBar = new ProgressBar(maxHealth, x, y - height/10, width, height/10, Color.RED);
+		ai = new EnemyAI(this, target, list);
 		setRealDimensions();
 	}
 	
@@ -88,9 +101,15 @@ public class Enemy extends Entity {
 		return new Grenade((direction == 1)? rx + rwidth + Grenade.swh + 1: rx - 1 - Grenade.swh, y, Constants.dim/18*direction, -Constants.dim/30);
 	}
 	
+	public Grenade shootD()
+	{
+		currentAction = EnemyAction.SHOOT;
+		return new Grenade((direction == 1)? rx + rwidth + Grenade.swh + 1: rx - 1 - Grenade.swh, y, Constants.dim/18*direction, Constants.dim/30);
+	}
+	
 	public void jump()
 	{
-		dy = -Constants.dim/20;
+		dy = -jumpSpeed;
 	}
 	
 	public void move(boolean right)
@@ -113,12 +132,22 @@ public class Enemy extends Entity {
 		walking = false;
 	}
 
+	public void turn(boolean right)
+	{
+		if(right)
+			direction = 1;
+		else
+			direction = -1;
+	}
+	
 	@Override
 	public void update(GraphicsContext gc)
 	{
+		ai.control();
+		
 		actions();
 		move();
-		
+	
 		if(currentAction.isPlayOnce() && currentAction.getSprite().hasPlayedOnce() && !currentAction.getSprite().isHolding())
 		{
 			currentAction.getSprite().reset();
