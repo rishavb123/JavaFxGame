@@ -20,6 +20,7 @@ import java.util.concurrent.Callable;
 import javax.imageio.ImageIO;
 
 import uiitems.Background;
+import uiitems.Grenade;
 import uiitems.Laser;
 import uiitems.UIItem;
 import uiitems.blocks.Block;
@@ -65,9 +66,10 @@ public class Game extends Application implements EventHandler<InputEvent>
 	private static ArrayList<UIItem> gameObjects;
 	
 	private Player player;
-	private Enemy enemy;
 	String name;
-
+	
+	private Enemy enemy;
+	
 	public void start(Stage stage)
 	{
 		this.stage = stage;
@@ -155,7 +157,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 		player = new Player(name, 100, 100);
 		player.setHealthBar(dim/60, dim/20, 3*dim/8, dim/10 - dim/60);
 		gameObjects.add(player);
-		Player testPlayer = new Player(name, 500, 100);
+		Player testPlayer = new Player(name, 800, 100);
 		testPlayer.setHealthBar(width - dim/60 - 3*dim/8, dim/20, 3*dim/8, dim/10 - dim/60);
 		gameObjects.add(testPlayer);
 		enemy = new Enemy(400,100);
@@ -194,6 +196,21 @@ public class Game extends Application implements EventHandler<InputEvent>
 	{
 		if(keys.containsKey(event.getCode()))
 			keys.get(event.getCode()).release();
+		
+		if(part == "Play")
+			switch(event.getCode())
+			{
+				case J:
+					enemy.stop();
+					break;
+					
+				case L:
+					enemy.stop();
+					break;
+					
+				default:
+					break;
+			}
 	}
 	
 	public void keyPressed(final KeyEvent event)
@@ -230,18 +247,36 @@ public class Game extends Application implements EventHandler<InputEvent>
 					case W:
 						player.jump();
 						break;
-					case I:
+					case O:
 						System.out.println("Player Action: "+player.getAction());
 						System.out.println("Health: "+player.getHealth());
 						System.out.println("X: "+player.getX());
 						System.out.println("Y: "+player.getY());
 						break;
-					
-					case L:
-						gameObjects.add(new Laser(0,0,0,10));
-					
+						
 					case P:
 						player.getAction().getSprite().saveCurrentFrame();
+						break;
+						
+					case U:
+						gameObjects.add(enemy.laser());
+						break;
+						
+					case I:
+						enemy.jump();
+						break;
+						
+					case J:
+						enemy.move(false);
+						break;
+						
+					case L:
+						enemy.move(true);
+						break;
+						
+					case M:
+						gameObjects.add(enemy.shoot());
+						break;
 						
 					default:
 						break;
@@ -294,7 +329,6 @@ public class Game extends Application implements EventHandler<InputEvent>
 	{
 		for(int x=0; x < gameObjects.size(); x++)
 		{
-			
 			if(gameObjects.get(x) instanceof Player)
 			{
 				Player p = (Player)gameObjects.get(x);
@@ -347,6 +381,13 @@ public class Game extends Application implements EventHandler<InputEvent>
 					p.setLeftTouch(false);
 					p.setRightTouch(false);
 				}
+				
+				if(((Entity)gameObjects.get(x)).getHealth() <= 0 || gameObjects.get(x).getX()+((Entity)gameObjects.get(x)).getWidth()<0 || gameObjects.get(x).getX()>Constants.width)
+				{
+					gameObjects.remove(x);
+					x--;
+					continue;
+				}
 			}
 			if(gameObjects.get(x) instanceof Laser)
 			{
@@ -362,7 +403,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 				for(int y=0;y<gameObjects.size();y++) {
 					if(gameObjects.get(y) instanceof Entity && laser.getRect().intersects(((Entity)gameObjects.get(y)).getRect()))
 					{
-						((Entity)gameObjects.get(y)).damage((int)(Math.sqrt(laser.getDx()*laser.getDx()+laser.getDy()*laser.getDy()))*10);
+						((Entity)gameObjects.get(y)).damage((int)(Math.sqrt(laser.getDx()*laser.getDx()+laser.getDy()*laser.getDy()))*5);
 						hit = true;
 					}
 					else if(gameObjects.get(y) instanceof Block && laser.getRect().intersects(((Block)gameObjects.get(y)).getRect()))
@@ -375,7 +416,65 @@ public class Game extends Application implements EventHandler<InputEvent>
 				{
 					gameObjects.remove(x);
 					x--;
+					continue;
 				}
+			}
+			if(gameObjects.get(x) instanceof Grenade) 
+			{
+				Grenade g = (Grenade)gameObjects.get(x);
+				
+				if(!g.isPresent())
+				{
+					gameObjects.remove(x);
+					x--;
+					continue;
+				}
+				
+				
+				
+				for(int y=0;y<gameObjects.size();y++)
+				{
+					
+					if(gameObjects.get(y) instanceof Entity && g.intersects(((Entity)gameObjects.get(y)).getRect()))
+					{
+						if(g.isExploded())
+						{
+							((Entity)gameObjects.get(y)).damage(10);
+						}
+						else
+						{
+							g.explode();
+							((Entity)gameObjects.get(y)).damage(400);
+							y =-1;
+						}
+					}
+					else if(gameObjects.get(y) instanceof Laser && g.intersects(((Laser)gameObjects.get(y)).getRect()))
+					{
+						if(!g.isExploded())
+						{
+							y = -1;
+							g.explode();
+						}
+					}
+					else if(gameObjects.get(y) instanceof Block && g.intersects(((Block)gameObjects.get(y)).getRect()))
+					{
+						if(!g.isExploded())
+						{
+							y = -1;
+							g.explode();
+						}
+					}
+					else if(gameObjects.get(y) instanceof BlockGroup)
+					{
+						for(Block b: ((BlockGroup)gameObjects.get(y)).getBlockList())
+							if(g.intersects(b.getRect()) && !g.isExploded())
+							{
+								y = -1;
+								g.explode();
+							}
+					}
+				}
+				
 			}
 		}
 	}

@@ -47,9 +47,9 @@ public class Player extends Entity {
 	private void setRealDimensions() 
 	{
 		rx = (int)(x+width/4.0);
-		ry = (int)(y+height*3.0/120);
+		ry = (int)(y+height/40.0);
 		rwidth = (int)(width/4.0);
-		rheight = (int)(height*88.0/120);		
+		rheight = (int)(height*11.0/15);		
 	}
 	
 	private void setDrawableDimensions()
@@ -60,7 +60,7 @@ public class Player extends Entity {
 	
 	public void setHealthBar(int x, int y, int width, int height)
 	{
-		healthBar = new ProgressBar(1000, x, y, width, height, Color.rgb(0, 255, 0));
+		healthBar = new ProgressBar(maxHealth, x, y, width, height, Color.rgb(0, 255, 0));
 	}
 	
 	@Override
@@ -196,12 +196,12 @@ public class Player extends Entity {
 	public void move(boolean right)
 	{		
 		if(right && !rightTouch) {
-			dx = 20;
+			dx = Constants.dim/30;
 			direction = 1;
 			walking = true;
 		}
 		else if(!leftTouch){
-			dx = -20;
+			dx = -Constants.dim/30;
 			direction = -1;
 			walking = true;
 		}
@@ -264,7 +264,6 @@ public class Player extends Entity {
 	{
 		dx = 0;
 		currentAction = PlayerAction.SHEILD;
-		health--;
 	}
 	
 	public void stopSheild()
@@ -301,7 +300,7 @@ public class Player extends Entity {
 		if(bottomTouch) 
 		{
 			bottomTouch = false;
-			dy = -25;
+			dy = -Constants.dim/24;
 			jumping = true;
 		}
 	}

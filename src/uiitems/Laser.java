@@ -20,7 +20,7 @@ public class Laser extends UIItem {
 		width = (Math.abs(dx)<Math.abs(dy)) ? Constants.dim/20 : Constants.dim/10;
 		height = (Math.abs(dx)<Math.abs(dy)) ? Constants.dim/10 : Constants.dim/20;
 	}
-	
+		
 	public int getDx() {
 		return dx;
 	}
@@ -29,6 +29,14 @@ public class Laser extends UIItem {
 		return dy;
 	}
 
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
 	public Laser(int x, int y, int dx) {
 		super.x = x;
 		super.y = y;
@@ -52,8 +60,10 @@ public class Laser extends UIItem {
 	@Override
 	public void update(GraphicsContext gc)
 	{
-		move();
+		
 		draw(gc);
+		move();
+		
 	}
 
 	@Override
