@@ -101,7 +101,7 @@ public class Enemy extends Entity {
 		return new Grenade((direction == 1)? rx + rwidth + Grenade.swh + 1: rx - 1 - Grenade.swh, y, Constants.dim/18*direction, -Constants.dim/30);
 	}
 	
-	public Grenade shootD()
+	public Grenade shootDown()
 	{
 		currentAction = EnemyAction.SHOOT;
 		return new Grenade((direction == 1)? rx + rwidth + Grenade.swh + 1: rx - 1 - Grenade.swh, y, Constants.dim/18*direction, Constants.dim/30);
@@ -115,12 +115,12 @@ public class Enemy extends Entity {
 	public void move(boolean right)
 	{
 		if(right && !rightTouch) {
-			dx = Constants.dim/20;
+			dx = Constants.dim/40;
 			direction = 1;
 			walking = true;
 		}
 		else if(!leftTouch){
-			dx = -Constants.dim/20;
+			dx = -Constants.dim/40;
 			direction = -1;
 			walking = true;
 		}

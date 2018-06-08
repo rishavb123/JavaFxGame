@@ -341,7 +341,16 @@ public class Game extends Application implements EventHandler<InputEvent>
 						if(gameObjects.get(y) instanceof Entity && gameObjects.get(y) != p && r.intersects(((Entity)gameObjects.get(y)).getRect()))
 						{
 							((Entity)gameObjects.get(y)).damage(1 + 2*(int)(Math.sqrt(p.getDx()*p.getDx()+p.getDy()*p.getDy())));
-							
+						}
+					}
+				} else {
+					int d = p.getDirection();
+					Rectangle2D r = new Rectangle2D(p.getRx() + ((d == 1)? p.getRWidth() : -1.3*p.getRWidth()), p.getRy(), 1.3*p.getRWidth(), p.getRHeight());
+					for(int y=0; y < gameObjects.size(); y++)
+					{
+						if(gameObjects.get(y) instanceof Enemy && gameObjects.get(y) != p && r.intersects(((Enemy)gameObjects.get(y)).getRect()))
+						{
+							p.damage(200);
 						}
 					}
 				}

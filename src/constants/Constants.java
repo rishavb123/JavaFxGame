@@ -12,4 +12,5 @@ public class Constants {
 	
 	//Health
 	public static final int healthLoss = 25;
+
 }
