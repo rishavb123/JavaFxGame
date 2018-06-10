@@ -16,6 +16,8 @@ import uiitems.entities.artificialIntelligence.EnemyAI;
 public class Enemy extends Entity {
 
 	public static int jumpSpeed = Constants.dim/20;
+	public static int grenadeSpeedX = Constants.dim/18;
+	public static int grenadeSpeedY = Constants.dim/30;
 	
 	protected EnemyAction currentAction;
 	protected int direction;
@@ -95,6 +97,12 @@ public class Enemy extends Entity {
 		return new Laser((direction==1)? rx+1+rwidth : rx - 1 - Constants.dim/10  , ry + rheight/10, direction*Constants.dim/10);
 	}
 	
+	public int[] grenadeStarttPositions()
+	{
+		int[] arr = {(direction == 1)? rx + rwidth + Grenade.swh + 1: rx - 1 - Grenade.swh, y};
+		return arr;
+	}
+	
 	public Grenade shoot()
 	{
 		currentAction = EnemyAction.SHOOT;
@@ -125,6 +133,13 @@ public class Enemy extends Entity {
 			walking = true;
 		}
 	}
+	
+	public boolean predictGrenade()
+	{
+		
+		
+		return true;
+	} 
 	
 	public void stop()
 	{

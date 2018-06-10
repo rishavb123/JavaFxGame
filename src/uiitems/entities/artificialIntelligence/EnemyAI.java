@@ -19,20 +19,33 @@ public class EnemyAI extends OneTargetAI<Enemy, Player>{
 		counter = (int)(Math.random()*30);
 	}
 	
+	public boolean predictGrenade()
+	{
+		int tcx = target.getX() + target.getWidth()/2;
+		int tcy = target.getY() + target.getHeight()/2;
+		int sx = control.grenadeStarttPositions()[0];
+		int sy = control.grenadeStarttPositions()[1];
+		
+		int tx = (tcx - sx)/(Enemy.grenadeSpeedX - control.getDx());
+		int ty = (tcy - sy)/(Enemy.grenadeSpeedY - control.getDy());
+		
+		return Math.abs(ty - tx) < 30;
+	}
+	
 	@Override
 	public void targetInteractions()
 	{
 		boolean d = false;
-		if(Math.abs(target.getRx() - control.getRx()) < control.predictGrenade()) {
+//		if(Math.abs(target.getRx() - control.getRx()) < control.predictGrenade()) {
 			if(target.getRx() - control.getRx() > 0 && target.getX()<=Constants.width)
 				d = true;
 			else if(target.getRx() - control.getRx() < 0 && target.getX()+target.getWidth()>=0)
 				d = false;
-		} else {
-			
-		}
+//		} else {
+//			
+//		}
 		
-		control.move(d);
+//		control.move(d);
 		
 		if(target.getRy() < control.getRy() - control.getHeight() && Enemy.getJumpMaxHeight(control.getRy())>0)
 			control.jump();
@@ -45,6 +58,9 @@ public class EnemyAI extends OneTargetAI<Enemy, Player>{
 				gameObjects.add(control.laser());
 			}
 		}
+		
+		if(predictGrenade())
+			control.shoot();
 		
 		counter++;
 	}
