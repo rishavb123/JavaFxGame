@@ -11,12 +11,15 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import uiitems.entities.actions.*;
+import utilities.MyFileReader;
+import utilities.MyFileWriter;
 
 public class Test extends Application {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		launch();
+		MyFileWriter.write("src/res/text/highscore.txt", "0");
+		System.out.println(MyFileReader.read("src/res/text/highscore.txt"));
+		System.out.println("Done");
 	}
 
 	@Override
@@ -37,9 +40,7 @@ public class Test extends Application {
 		
 		Image background = new Image("res/imgs/MenuBackground.PNG");
 		gc.drawImage(background, 0, 0, canvas.getWidth(), canvas.getHeight());
-		
-		System.exit(0);
-		
+				
 	}
 
 }

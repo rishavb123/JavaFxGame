@@ -2,10 +2,13 @@ package uiitems.blockGroups;
 
 import java.util.ArrayList;
 
-import constants.Constants;
 import uiitems.blocks.Block;
+import utilities.Constants;
 
 public class Floor extends BlockGroup {
+	
+	protected ArrayList<Block> blockList;
+
 	
 	public Floor() 
 	{

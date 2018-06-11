@@ -1,10 +1,10 @@
 package uiitems;
 
-import constants.Constants;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import utilities.Constants;
 
 public class Grenade extends UIItem {
 

@@ -2,13 +2,13 @@ package uiitems.blocks;
 
 import java.awt.image.BufferedImage;
 
-import constants.Constants;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import uiitems.UIItem;
 import uiitems.entities.Entity;
 import uiitems.entities.spritesheet.SpriteSheet;
+import utilities.Constants;
 
 public class Block extends UIItem {
 
@@ -59,7 +59,7 @@ public class Block extends UIItem {
 		e.rightTouched(x + Constants.dim/10 -1);
 	}
 	
-	public final void hit(Entity e)
+	public void hit(Entity e)
 	{		
 		if(e.getRx() + e.getRWidth() < x + e.getDx() + 1 && e.getRy() + e.getRWidth() > y)
 			hitFromLeft(e);

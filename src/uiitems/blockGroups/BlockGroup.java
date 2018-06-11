@@ -7,9 +7,7 @@ import uiitems.UIItem;
 import uiitems.blocks.Block;
 
 public abstract class BlockGroup extends UIItem{
-	
-	protected ArrayList<Block> blockList;
-	
+		
 	public abstract ArrayList<Block> getBlockList();
 	
 	@Override

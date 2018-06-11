@@ -1,9 +1,9 @@
 package uiitems;
 
-import constants.Constants;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import utilities.Constants;
 
 public class Laser extends UIItem {
 

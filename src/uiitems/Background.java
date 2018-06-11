@@ -1,9 +1,9 @@
 package uiitems;
 
-import constants.Constants;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import utilities.Constants;
 
 public class Background extends UIItem {
 
@@ -14,7 +14,7 @@ public class Background extends UIItem {
 	
 	public Background(String path) 
 	{
-		image = new Image(path);
+		if(path!=null) image = new Image(path);
 		width = Constants.width;
 		backgroundColor = Color.rgb(0, 0, 0, 0);;
 		this.cover = Color.rgb(0, 0, 0, 0);;
@@ -22,7 +22,7 @@ public class Background extends UIItem {
 	
 	public Background(String path, int width, Color backgroundColor) 
 	{
-		image = new Image(path);
+		if(path!=null) image = new Image(path);
 		this.width = width;
 		this.backgroundColor = backgroundColor;
 		this.cover = Color.rgb(0, 0, 0, 0);
@@ -30,7 +30,7 @@ public class Background extends UIItem {
 	
 	public Background(String path, Color cover) 
 	{
-		image = new Image(path);
+		if(path!=null) image = new Image(path);
 		width = Constants.width;
 		backgroundColor = Color.rgb(0, 0, 0, 0);
 		this.cover = cover;
@@ -38,7 +38,7 @@ public class Background extends UIItem {
 	
 	public Background(String path, int width, Color backgroundColor, Color cover) 
 	{
-		image = new Image(path);
+		if(path!=null) image = new Image(path);
 		this.width = width;
 		this.backgroundColor = backgroundColor;
 		this.cover = cover;

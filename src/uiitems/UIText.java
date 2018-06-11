@@ -25,6 +25,11 @@ public class UIText extends UIItem
 		this.color = color;
 	}
 	
+	public void setText(String text)
+	{
+		this.text.setText(text);
+	}
+	
 	public double getWidth()
 	{
 		return width;

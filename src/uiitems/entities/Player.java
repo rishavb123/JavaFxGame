@@ -1,10 +1,10 @@
 package uiitems.entities;
 
-import constants.Constants;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import uiitems.entities.actions.PlayerAction;
+import utilities.Constants;
 import uiitems.Laser;
 import uiitems.ProgressBar;
 
@@ -40,7 +40,7 @@ public class Player extends Entity {
 		health = maxHealth;
 		direction = 1;
 		longAttackPointer = x+width;
-
+		longAttackPointerSpeed = Constants.dim/20;
 		setRealDimensions();
 	}
 	
@@ -162,25 +162,22 @@ public class Player extends Entity {
 				fly();
 		}
 		
-		if(shortAttacking)
-			shortAttack();
-		
-		if(sheilding)
-			sheild();
-		
 		if(longAttacking) 
 			longAttack();
 		else
 			longAttackPointer = (direction==-1)? x - Constants.dim/20  : x + width;
 		
+		if(shortAttacking)
+			shortAttack();
+		
+		else if(sheilding)
+			sheild();
+		
 		this.currentAction.getSprite().update();
 		move();
 		
-		if(!(flying||walking||jumping||shortAttacking||sheilding||dx!=0||dy!=0) && health<maxHealth)
-		{
-			if((int)(Math.random()*2) == 0)
-				health++;
-		}
+		if(health<maxHealth)
+			health++;
 		
 		healthBar.setValue(health);
 		if(health>0 && health<=maxHealth)
@@ -280,7 +277,8 @@ public class Player extends Entity {
 	
 	public void longAttack()
 	{
-		longAttackPointerSpeed+=0.5;
+		sheilding = false;
+		shortAttacking = false;
 		currentAction = PlayerAction.LONGATTACK;
 		longAttackPointer+=(int)(Constants.dim/1200.0*longAttackPointerSpeed*direction);
 		dx = 0;
@@ -288,7 +286,6 @@ public class Player extends Entity {
 	
 	public Laser stopLongAttack()
 	{
-		longAttackPointerSpeed = 0;
 		PlayerAction.LONGATTACK.getSprite().reset();
 		longAttacking = false;
 		currentAction = PlayerAction.LONGATTACKDOWN;
@@ -309,7 +306,7 @@ public class Player extends Entity {
 	public void damage(int i)
 	{
 		if(sheilding)
-			health-=i/2;
+			health-=i/10;
 		else
 			health-=i;
 	}
@@ -392,6 +389,10 @@ public class Player extends Entity {
 
 	public ProgressBar getHealthBar() {
 		return healthBar;
+	}
+	
+	public void setDirection(int i) {
+		direction = i;
 	}
 
 

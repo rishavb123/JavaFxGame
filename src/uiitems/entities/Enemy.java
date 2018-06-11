@@ -2,7 +2,6 @@ package uiitems.entities;
 
 import java.util.ArrayList;
 
-import constants.Constants;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -12,6 +11,7 @@ import uiitems.ProgressBar;
 import uiitems.UIItem;
 import uiitems.entities.actions.EnemyAction;
 import uiitems.entities.artificialIntelligence.EnemyAI;
+import utilities.Constants;
 
 public class Enemy extends Entity {
 
@@ -91,13 +91,17 @@ public class Enemy extends Entity {
 		return ry;
 	}
 	
+	public int getDirection() {
+		return direction;
+	}
+	
 	public Laser laser()
 	{
 		currentAction = EnemyAction.LASER;
 		return new Laser((direction==1)? rx+1+rwidth : rx - 1 - Constants.dim/10  , ry + rheight/10, direction*Constants.dim/10);
 	}
 	
-	public int[] grenadeStarttPositions()
+	public int[] grenadeStartPositions()
 	{
 		int[] arr = {(direction == 1)? rx + rwidth + Grenade.swh + 1: rx - 1 - Grenade.swh, y};
 		return arr;
@@ -123,23 +127,16 @@ public class Enemy extends Entity {
 	public void move(boolean right)
 	{
 		if(right && !rightTouch) {
-			dx = Constants.dim/40;
+			dx = Constants.dim/60;
 			direction = 1;
 			walking = true;
 		}
 		else if(!leftTouch){
-			dx = -Constants.dim/40;
+			dx = -Constants.dim/60;
 			direction = -1;
 			walking = true;
 		}
 	}
-	
-	public boolean predictGrenade()
-	{
-		
-		
-		return true;
-	} 
 	
 	public void stop()
 	{

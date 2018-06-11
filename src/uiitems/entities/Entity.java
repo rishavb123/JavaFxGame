@@ -5,7 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import uiitems.UIItem;
-import constants.Constants;
+import utilities.Constants;
 
 public class Entity extends UIItem {
 
@@ -111,12 +111,6 @@ public class Entity extends UIItem {
 	{
 		if(!bottomTouch)
 			gravity();
-		
-		if(this.y<=0) {
-			dy = Constants.g*10;
-			health-=2*Constants.healthLoss;
-			y = 0;
-		}
 	}
 	public void gravity()
 	{
