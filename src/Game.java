@@ -439,7 +439,6 @@ public class Game extends Application implements EventHandler<InputEvent>
 		else if(!player2.isAlive())
 			win(1);
 		
-		System.out.println(player2.getX());
 		
 	}
 	
