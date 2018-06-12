@@ -10,6 +10,7 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.media.AudioClip;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 
@@ -83,12 +84,16 @@ public class Game extends Application implements EventHandler<InputEvent>
 	private UIText scoreDisplay;
 	private UIText highScoreDisplay;
 	
+	private boolean blocks;
+	
+	private AudioClip music;
 	
 	public void start(Stage stage)
 	{
 		this.stage = stage;
 		
 		setPart("Game Menu");
+		setMusic("/res/audio/background.mp3");
 		
 		try {
 			Block.blockSheet = ImageIO.read(getClass().getResourceAsStream("uiitems/blocks/blockImages/BlockSheet.png"));
@@ -128,6 +133,16 @@ public class Game extends Application implements EventHandler<InputEvent>
 		items = menuItems;
 	}
 	
+	public void setMusic(String path)
+	{
+		if(music!=null)
+			music.stop();
+		music = new AudioClip(getClass().getResource(path).toString());
+		music.setCycleCount(AudioClip.INDEFINITE);
+		music.play();
+		
+	}
+	
 	public void setPart(String s)
 	{
 		part = s;
@@ -140,7 +155,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 		
 		name = "Iaz";
 		menuItems = new ArrayList<>();
-		menuItems.add(Title.centerTitle(name+"'s Mission", dim/6, dim/8, width));
+		menuItems.add(Title.centerTitle("Derp Ninjas 4", dim/6, dim/8, width));
 		menuItems.add(MenuItem.centerMenuItem("Play", dim/3, dim/12, width, new Callable<Void>() {
 
 			@Override
@@ -156,12 +171,31 @@ public class Game extends Application implements EventHandler<InputEvent>
 			@Override
 			public Void call() throws Exception
 			{
+				if(!blocks) {
+					blocks = true;
+					setMultiPlayer();
+				}
 				playMultiPlayer();
 				return null;
 			}
 			
 		}));
-		menuItems.add(MenuItem.centerMenuItem("Exit", 2*dim/3, dim/12, width, new Callable<Void>() {
+		
+		menuItems.add(MenuItem.centerMenuItem("Multi Player (Without Blocks)", 2*dim/3, dim/12, width, new Callable<Void>() {
+			
+			@Override
+			public Void call() throws Exception
+			{
+				if(blocks) {
+					blocks = false;
+					setMultiPlayer();
+				}
+				playMultiPlayer();
+				return null;
+			}
+			
+		}));
+		menuItems.add(MenuItem.centerMenuItem("Exit", 5*dim/6, dim/12, width, new Callable<Void>() {
 
 			@Override
 			public Void call() throws Exception 
@@ -207,11 +241,14 @@ public class Game extends Application implements EventHandler<InputEvent>
 		player2.setHealthBar(width - dim/60 - 3*dim/8, dim/20, 3*dim/8, dim/10 - dim/60);
 		multiPlayerObjects.add(player1);
 		multiPlayerObjects.add(player2);
-		multiPlayerObjects.add(new Platform(Constants.dim/5, Constants.dim*3/10, 4, "ghost"));
-		multiPlayerObjects.add(new Platform(Constants.dim/5, Constants.dim*3/5, 4, "bouncy"));
-		multiPlayerObjects.add(new Platform(width - Constants.dim*3/5, Constants.dim*3/10, 4, "ghost"));
-		multiPlayerObjects.add(new Platform(width - Constants.dim*3/5, Constants.dim*3/5, 4, "bouncy"));
-		multiPlayerObjects.add(new Platform(Constants.dim*4/5, Constants.dim*9/20, 4));
+		if(blocks)
+		{
+			multiPlayerObjects.add(new Platform(Constants.dim/5, Constants.dim*3/10, 4, "ghost"));
+			multiPlayerObjects.add(new Platform(Constants.dim/5, Constants.dim*3/5, 4, "bouncy"));
+			multiPlayerObjects.add(new Platform(width - Constants.dim*3/5, Constants.dim*3/10, 4, "ghost"));
+			multiPlayerObjects.add(new Platform(width - Constants.dim*3/5, Constants.dim*3/5, 4, "bouncy"));
+			multiPlayerObjects.add(new Platform(Constants.dim*4/5, Constants.dim*9/20, 4));
+		}
 		multiPlayerObjects.add(new Floor(0, 3));
 	}
 	

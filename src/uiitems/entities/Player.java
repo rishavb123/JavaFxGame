@@ -2,6 +2,7 @@ package uiitems.entities;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import uiitems.entities.actions.PlayerAction;
 import utilities.Constants;
@@ -26,8 +27,15 @@ public class Player extends Entity {
 	private boolean walking;
 	private boolean jumping;
 	private boolean shortAttacking;
-	private boolean sheilding;
+	private boolean shielding;
 	private boolean longAttacking;
+	
+	private AudioClip jumpClip;
+	private AudioClip shortAttackClip;
+	private AudioClip shieldClip;
+	private AudioClip longAttackClip;
+	private AudioClip laserClip;
+	private AudioClip flyClip;
 	
 	private int longAttackPointer;
 	private double longAttackPointerSpeed;
@@ -41,6 +49,12 @@ public class Player extends Entity {
 		direction = 1;
 		longAttackPointer = x+width;
 		longAttackPointerSpeed = Constants.dim/20;
+		jumpClip = new AudioClip(getClass().getResource("../../res/audio/jump.mp3").toString());
+		shortAttackClip = new AudioClip(getClass().getResource("../../res/audio/sword.mp3").toString());
+		shieldClip = new AudioClip(getClass().getResource("../../res/audio/shield.mp3").toString());
+		longAttackClip = new AudioClip(getClass().getResource("../../res/audio/charge.mp3").toString());
+		laserClip = new AudioClip(getClass().getResource("../../res/audio/zap.mp3").toString());
+		flyClip = new AudioClip(getClass().getResource("../../res/audio/fly.mp3").toString());
 		setRealDimensions();
 	}
 	
@@ -170,8 +184,8 @@ public class Player extends Entity {
 		if(shortAttacking)
 			shortAttack();
 		
-		else if(sheilding)
-			sheild();
+		else if(shielding)
+			shield();
 		
 		this.currentAction.getSprite().update();
 		move();
@@ -193,11 +207,15 @@ public class Player extends Entity {
 	public void move(boolean right)
 	{		
 		if(right && !rightTouch) {
+			if(dx != Constants.dim/30 && shortAttacking)
+				shortAttackClip.play();
 			dx = Constants.dim/30;
 			direction = 1;
 			walking = true;
 		}
 		else if(!leftTouch){
+			if(dx != -Constants.dim/30 && shortAttacking)
+				shortAttackClip.play();
 			dx = -Constants.dim/30;
 			direction = -1;
 			walking = true;
@@ -214,6 +232,8 @@ public class Player extends Entity {
 	public void startFly()
 	{
 		flying = true;
+		if(bottomTouch)
+			flyClip.play();
 	}
 	
 	public void fly() 
@@ -231,33 +251,39 @@ public class Player extends Entity {
 	{
 		currentAction = PlayerAction.IDLE;
 		flying = false;
+		flyClip.stop();
 	}
 	
 	public void startShortAttack()
 	{
+		if(!shortAttacking)
+			shortAttackClip.play();
 		jumping = false;
 		shortAttacking = true;
 	}
 	
 	public void shortAttack()
 	{
+		shielding = false;
 		currentAction = PlayerAction.SHORTATTACK;
-		sheilding = false;
-		
 	}
 	
 	public void stopShortAttack()
 	{
 		shortAttacking = false;
 		currentAction = PlayerAction.IDLE;
+		shortAttackClip.stop();
 	}
 	
 	public void startSheild()
 	{
-		sheilding = true;
+		if(!shielding) {
+			shieldClip.play();
+			shielding = true;
+		}
 	}
 	
-	public void sheild()
+	public void shield()
 	{
 		dx = 0;
 		currentAction = PlayerAction.SHEILD;
@@ -266,18 +292,23 @@ public class Player extends Entity {
 	public void stopSheild()
 	{
 		PlayerAction.SHEILD.getSprite().reset();
-		sheilding = false;
+		shielding = false;
 		currentAction = PlayerAction.IDLE;
+		shieldClip.stop();
 	}
 	
 	public void startLongAttack()
 	{
-		longAttacking = true;
+		if(!longAttacking)
+		{
+			longAttackClip.play();
+			longAttacking = true;
+		}
 	}
 	
 	public void longAttack()
 	{
-		sheilding = false;
+		shielding = false;
 		shortAttacking = false;
 		currentAction = PlayerAction.LONGATTACK;
 		longAttackPointer+=(int)(Constants.dim/1200.0*longAttackPointerSpeed*direction);
@@ -286,6 +317,8 @@ public class Player extends Entity {
 	
 	public Laser stopLongAttack()
 	{
+		laserClip.play();
+		longAttackClip.stop();
 		PlayerAction.LONGATTACK.getSprite().reset();
 		longAttacking = false;
 		currentAction = PlayerAction.LONGATTACKDOWN;
@@ -297,6 +330,7 @@ public class Player extends Entity {
 		if(bottomTouch) 
 		{
 			bottomTouch = false;
+			jumpClip.play();
 			dy = -Constants.dim/24;
 			jumping = true;
 		}
@@ -305,7 +339,7 @@ public class Player extends Entity {
 	@Override
 	public void damage(int i)
 	{
-		if(sheilding)
+		if(shielding && !shortAttacking)
 			health-=i/10;
 		else
 			health-=i;
@@ -379,7 +413,7 @@ public class Player extends Entity {
 	
 	public boolean isSheilding()
 	{
-		return sheilding;
+		return shielding;
 	}
 
 	public boolean isLongAttacking() 
