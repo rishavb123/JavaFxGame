@@ -138,6 +138,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 		if(music!=null)
 			music.stop();
 		music = new AudioClip(getClass().getResource(path).toString());
+		music.setVolume(0.5);
 		music.setCycleCount(AudioClip.INDEFINITE);
 		music.play();
 		
@@ -249,7 +250,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 			multiPlayerObjects.add(new Platform(width - Constants.dim*3/5, Constants.dim*3/5, 4, "bouncy"));
 			multiPlayerObjects.add(new Platform(Constants.dim*4/5, Constants.dim*9/20, 4));
 		}
-		multiPlayerObjects.add(new Floor(0, 3));
+		multiPlayerObjects.add(new Floor(40, -10, 9, 0, 3));
 	}
 	
 	public void setWin(int i)
@@ -438,6 +439,8 @@ public class Game extends Application implements EventHandler<InputEvent>
 		else if(!player2.isAlive())
 			win(1);
 		
+		System.out.println(player2.getX());
+		
 	}
 	
 	public void updateGame()
@@ -587,7 +590,7 @@ public class Game extends Application implements EventHandler<InputEvent>
 					{
 						if(items.get(y) instanceof Entity && items.get(y) != p && r.intersects(((Entity)items.get(y)).getRect()))
 						{
-							((Entity)items.get(y)).damage(1 + (int)(Math.sqrt(p.getDx()*p.getDx()+p.getDy()*p.getDy())));
+							((Entity)items.get(y)).damage(1 + ((part.equals("Multi Player"))? 2: 1)*(int)(Math.sqrt(p.getDx()*p.getDx()+p.getDy()*p.getDy())));
 						}
 						if(items.get(y) instanceof Enemy && items.get(y) != p && r.intersects(((Enemy)items.get(y)).getRect()))
 						{
@@ -642,15 +645,36 @@ public class Game extends Application implements EventHandler<InputEvent>
 					p.setRightTouch(false);
 				}
 				
-				if(((Entity)items.get(x)).getHealth() <= 0 || ((Entity)items.get(x)).getRx()+((Entity)items.get(x)).getRWidth()<0 || ((Entity)items.get(x)).getRx()>Constants.width)
+				if(((Entity)items.get(x)).getHealth() <= 0)
 				{
-					if(items.get(x) instanceof Enemy && ((Entity)items.get(x)).getHealth() <= 0)
+					if(items.get(x) instanceof Enemy)
 						score++;
 					((Entity)items.get(x)).die();
 					items.remove(x);
 					x--;
 					continue;
 				}
+				
+				if(((Entity)items.get(x)).getRx()>Constants.width || ((Entity)items.get(x)).getRx()+((Entity)items.get(x)).getRWidth()<0)
+				{
+					if(part.equals("Multi Player") && items.get(x) instanceof Player)
+					{
+						int nx;
+						if(((Entity)items.get(x)).getRx()>Constants.width)
+							nx = 0;
+						else
+							nx = Constants.width - ((Entity)items.get(x)).getRWidth();
+						((Player)items.get(x)).setRx(nx);
+					}
+					else
+					{
+						((Entity)items.get(x)).die();
+						items.remove(x);
+						x--;
+						continue;
+					}
+				}
+				
 			}
 			if(items.get(x) instanceof Laser)
 			{

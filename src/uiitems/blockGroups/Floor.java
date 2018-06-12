@@ -37,6 +37,15 @@ public class Floor extends BlockGroup {
 		}
 	}
 	
+	public Floor(int width, int startX, int startY, int row, int col)
+	{
+		blockList = new ArrayList<>();
+		for(int x=0;x<width;x++)
+		{
+			blockList.add(new Block(Constants.dim*(x+startX)/10, Constants.dim*startY/10, row, col));
+		}
+	}
+	
 	public Floor(int y, int row, int col) 
 	{
 		blockList = new ArrayList<>();

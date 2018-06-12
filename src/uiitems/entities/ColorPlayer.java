@@ -8,7 +8,7 @@ public class ColorPlayer extends Player {
 	private Color backgroundColor;
 	
 	public ColorPlayer(String name, int x, int y, Color c) {
-		super(name, x, y);
+		super(name, x, y, true);
 		backgroundColor = c;
 	}
 	

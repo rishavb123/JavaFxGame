@@ -39,12 +39,30 @@ public class Player extends Entity {
 	
 	private int longAttackPointer;
 	private double longAttackPointerSpeed;
-	
+		
 	public Player(String name, int x, int y) {
 		super(x, y);
 		this.name = name;
 		currentAction = PlayerAction.IDLE;
 		maxHealth = 1000;
+		health = maxHealth;
+		direction = 1;
+		longAttackPointer = x+width;
+		longAttackPointerSpeed = Constants.dim/20;
+		jumpClip = new AudioClip(getClass().getResource("../../res/audio/jump.mp3").toString());
+		shortAttackClip = new AudioClip(getClass().getResource("../../res/audio/sword.mp3").toString());
+		shieldClip = new AudioClip(getClass().getResource("../../res/audio/shield.mp3").toString());
+		longAttackClip = new AudioClip(getClass().getResource("../../res/audio/charge.mp3").toString());
+		laserClip = new AudioClip(getClass().getResource("../../res/audio/zap.mp3").toString());
+		flyClip = new AudioClip(getClass().getResource("../../res/audio/fly.mp3").toString());
+		setRealDimensions();
+	}
+	
+	public Player(String name, int x, int y, boolean weaker) {
+		super(x, y);
+		this.name = name;
+		currentAction = PlayerAction.IDLE;
+		maxHealth = weaker? 600:1000;
 		health = maxHealth;
 		direction = 1;
 		longAttackPointer = x+width;
@@ -427,6 +445,11 @@ public class Player extends Entity {
 	
 	public void setDirection(int i) {
 		direction = i;
+	}
+
+	public void setRx(int nx) {
+		rx = nx;
+		setDrawableDimensions();
 	}
 
 
